@@ -1,0 +1,120 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1776632530269,
+  "projectRoot": "/Users/tristan/Documents/Workspaces/constructions-incongrues/musiqueapproximative.net/mix",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "vitest",
+        "version": "2.0.0",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": "npm test",
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {
+      "test": "vitest run",
+      "test:watch": "vitest"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "src"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 2,
+      "lastAccessed": 1776632529902,
+      "keyFiles": [
+        "lib.js",
+        "lib.test.js"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "index.html",
+      "accessCount": 17,
+      "lastAccessed": 1776633148944,
+      "type": "file"
+    },
+    {
+      "path": "src/audio.js",
+      "accessCount": 1,
+      "lastAccessed": 1776632904144,
+      "type": "file"
+    },
+    {
+      "path": "src/library.js",
+      "accessCount": 1,
+      "lastAccessed": 1776632925244,
+      "type": "file"
+    },
+    {
+      "path": "src/mixer.js",
+      "accessCount": 1,
+      "lastAccessed": 1776632979713,
+      "type": "file"
+    },
+    {
+      "path": "src/main.js",
+      "accessCount": 1,
+      "lastAccessed": 1776633009059,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 1,
+      "lastAccessed": 1776633219115,
+      "type": "directory"
+    },
+    {
+      "path": "NOTES.md",
+      "accessCount": 1,
+      "lastAccessed": 1776633223727,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 1,
+      "lastAccessed": 1776633256005,
+      "type": "file"
+    },
+    {
+      "path": "CNAME",
+      "accessCount": 1,
+      "lastAccessed": 1776633563360,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

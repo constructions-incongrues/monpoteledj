@@ -1,0 +1,1362 @@
+<!DOCTYPE html><html lang="fr"><head>
+
+
+<meta charset="utf-8">
+<title>Table de mixage — Musique Approximative</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style id="ma-tokens">
+/* =========================================================
+   MUSIQUE APPROXIMATIVE — COLORS & TYPE
+   A high-contrast black/white system for mélomanes fêlé⋅e⋅s
+   ========================================================= */
+
+/* ---- Webfonts (Google Fonts) ---- */
+@import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Rambla:wght@400;700&display=swap');
+
+:root {
+  /* -------- COLORS : foundations -------- */
+  --ma-black:       #000000;    /* the absolute. backgrounds, headers, capsules */
+  --ma-white:       #ffffff;    /* the absolute, inverted. content bg, text */
+
+  /* Grays — only 3 of them, used sparingly */
+  --ma-gray-light:  #bbbbbb;    /* contributor links, dim text on black */
+  --ma-gray-mid:    #aaaaaa;    /* player seek-bar base, disabled/inactive */
+  --ma-gray-dark:   #555555;    /* article h2, muted text on white */
+  --ma-gray-ink:    #555050;    /* article link default on white — slightly warm */
+
+  /* -------- SEMANTIC : foreground / background -------- */
+  /* "Stage on white" — article bodies, content-text */
+  --ma-bg:          var(--ma-white);
+  --ma-fg:          var(--ma-black);
+  --ma-fg-muted:    var(--ma-gray-dark);
+  --ma-fg-subtle:   var(--ma-gray-ink);
+
+  /* "Stage on black" — headers, contributor footer, capsules */
+  --ma-bg-inverse:  var(--ma-black);
+  --ma-fg-inverse:  var(--ma-white);
+  --ma-fg-inverse-muted: var(--ma-gray-light);
+
+  /* Player / controls */
+  --ma-rail:        var(--ma-gray-mid);   /* seek + volume rail bg */
+  --ma-rail-fill:   var(--ma-black);       /* played / filled portion */
+
+  /* Selection — always inverts whatever surface you're on */
+  --ma-select-bg-on-white: var(--ma-black);
+  --ma-select-fg-on-white: var(--ma-white);
+  --ma-select-bg-on-black: var(--ma-white);
+  --ma-select-fg-on-black: var(--ma-black);
+
+  /* -------- TYPE : families -------- */
+  --ma-font-display: "Arvo", "Courier New", serif;      /* slab-serif, geometric, posters */
+  --ma-font-body:    "Rambla", "Helvetica Neue", Arial, sans-serif; /* humanist sans */
+  --ma-font-mono:    "Courier New", ui-monospace, monospace;
+
+  /* -------- TYPE : scale (ported from rem-based 62.5% root) -------- */
+  --ma-text-xs:     1.0rem;  /* 10px  — footer h2, all-tracks list items */
+  --ma-text-sm:     1.1rem;  /* 11px  — header nav "PARCOURIR", uppercase */
+  --ma-text-md:     1.2rem;  /* 12px  — descriptif, pitch value */
+  --ma-text-base:   1.3rem;  /* 13px  — contributor section title, controls */
+  --ma-text-lg:     2rem;    /* 20px  — mobile title */
+  --ma-text-xl:     2.5rem;  /* 25px  — small-screen title */
+  --ma-text-2xl:    3rem;    /* 30px  — small laptop title */
+  --ma-text-3xl:    3.5rem;  /* 35px  — article h2 default, section titles */
+  --ma-text-4xl:    4rem;    /* 40px  — article h1 (track author) */
+  --ma-text-5xl:    4.9rem;  /* 49px  — wide-screen title */
+
+  /* -------- TYPE : weights -------- */
+  --ma-weight-regular: 400;
+  --ma-weight-bold:    700;
+
+  /* -------- TYPE : transforms -------- */
+  --ma-caps:        uppercase;
+
+  /* -------- SPACING (loose, as used in layout) -------- */
+  --ma-space-1:  5px;
+  --ma-space-2:  10px;
+  --ma-space-3:  15px;
+  --ma-space-4:  20px;
+  --ma-space-5:  30px;
+  --ma-space-6:  40px;
+
+  /* -------- MISC -------- */
+  --ma-border-hair:   1px solid var(--ma-black);
+  --ma-radius-none:   0;        /* nothing is rounded. it's a principle. */
+
+  /* Transitions — jPlayer default: linear, 0.15s, for bg/color/opacity */
+  --ma-transition:    background-color 0.15s linear, color 0.15s linear, opacity 0.15s linear;
+}
+
+/* =========================================================
+   BASE / ROOT
+   ========================================================= */
+
+/* html font-size: 62.5% base — makes 1rem = 10px (legacy-but-working trick) */
+html { font-size: 62.5%; }
+
+body {
+  background-color: var(--ma-bg-inverse);
+  color: var(--ma-fg-inverse);
+  font-family: var(--ma-font-body);
+  font-size: var(--ma-text-base);
+  line-height: 1.4;
+}
+
+/* =========================================================
+   SEMANTIC TYPE : how it's used in the product
+   ========================================================= */
+
+/* h1 — track / article title. Arvo, black on white, centered. */
+.ma-h1, article h1 {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-4xl);
+  font-weight: var(--ma-weight-bold);
+  color: var(--ma-fg);
+  background: var(--ma-bg);
+  text-align: center;
+  padding: var(--ma-space-4) 0 var(--ma-space-2) 0;
+  line-height: 1.1;
+}
+
+/* h2 — track title / subtitle. Arvo, warm-gray on white. */
+.ma-h2, article h2 {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-3xl);
+  color: var(--ma-fg-muted);
+  background: var(--ma-bg);
+  text-align: center;
+}
+
+/* Big masthead title — "MUSIQUE APPROXIMATIVE" in black capsule */
+.ma-title {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-5xl);
+  color: var(--ma-fg-inverse);
+  background: var(--ma-bg-inverse);
+  text-align: center;
+  padding: var(--ma-space-4) 0;
+  line-height: 1;
+}
+
+/* Body paragraph — white background, centered, intimate line-length */
+.ma-p, article p {
+  font-family: var(--ma-font-body);
+  font-size: var(--ma-text-base);
+  color: var(--ma-fg);
+  text-align: center;
+  padding: var(--ma-space-4) 0;
+}
+
+/* Small UPPERCASE header line — "PARCOURIR : TOUS LES MORCEAUX" */
+.ma-caps-sm, header p {
+  font-family: var(--ma-font-body);
+  font-size: var(--ma-text-sm);
+  text-transform: var(--ma-caps);
+  color: var(--ma-fg-inverse);
+  background: var(--ma-bg-inverse);
+  padding: var(--ma-space-1) 0 0 0;
+  line-height: 1.3;
+}
+
+/* Contributor / footer headings — small white on black */
+.ma-h-footer {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-xs);
+  color: var(--ma-fg-inverse);
+  padding: var(--ma-space-2) 0;
+}
+
+/* About-text body (footer) — justified, Rambla, light gray */
+.ma-about-p {
+  font-family: var(--ma-font-body);
+  color: var(--ma-fg-inverse-muted);
+  text-align: justify;
+  line-height: 1.5;
+}
+
+/* Code / technical */
+.ma-code {
+  font-family: var(--ma-font-mono);
+  font-size: var(--ma-text-md);
+  background: var(--ma-bg);
+  color: var(--ma-fg);
+  padding: 0 4px;
+}
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+/* Link on white (article body) — warm muted gray; hovers to pure black */
+.ma-link-light {
+  color: var(--ma-fg-subtle);
+  text-decoration: none;
+}
+.ma-link-light:hover { color: var(--ma-fg); }
+
+/* Link on black (contributors) — light gray; hovers INVERT (white bg, black fg) */
+.ma-link-dark {
+  color: var(--ma-fg-inverse-muted);
+  background: var(--ma-bg-inverse);
+  text-decoration: none;
+}
+.ma-link-dark:hover {
+  color: var(--ma-fg);
+  background: var(--ma-bg);
+  text-decoration: none;
+}
+
+/* Underlined About-style link */
+.ma-link-about {
+  color: var(--ma-fg-inverse-muted);
+  text-decoration: underline;
+  background-color: var(--ma-bg-inverse);
+}
+.ma-link-about:hover {
+  color: var(--ma-fg-inverse);
+  text-decoration: underline;
+}
+
+/* =========================================================
+   TEXT SELECTION : always inverts the surface
+   ========================================================= */
+::selection {
+  background-color: var(--ma-select-bg-on-white);
+  color: var(--ma-select-fg-on-white);
+}
+.ma-on-black ::selection {
+  background-color: var(--ma-select-bg-on-black);
+  color: var(--ma-select-fg-on-black);
+}
+
+/* =========================================================
+   RESPONSIVE TITLE — stepped-down size brackets
+   (preserved exactly from production CSS)
+   ========================================================= */
+@media (max-width: 1050px) { .ma-title { font-size: var(--ma-text-3xl); } }
+@media (max-width: 800px)  { .ma-title { font-size: var(--ma-text-3xl); } }
+@media (max-width: 720px)  { .ma-title { font-size: var(--ma-text-2xl); } }
+@media (max-width: 630px)  { .ma-title { font-size: var(--ma-text-xl);  } }
+@media (max-width: 530px)  { .ma-title { font-size: var(--ma-text-lg);  } }
+@media (max-width: 430px)  { .ma-title { font-size: 1.5rem; } }
+@media (max-width: 370px)  { .ma-title { font-size: 1.2rem; } }
+
+</style>
+<style>
+  /* ========================================================
+     MIXER — Musique Approximative
+     Stark black & white. 0 radius. 0.15s linear transitions.
+     ======================================================== */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ma-white);
+    color: var(--ma-black);
+    font-family: var(--ma-font-body);
+    font-size: 1.3rem;
+    line-height: 1.4;
+    min-height: 100vh;
+  }
+  /* INVERT THE WHOLE RIG (dark-mode tweak) */
+  body.invert {
+    filter: invert(1) hue-rotate(180deg);
+    background: #000;
+  }
+  /* Glitch PNGs / logo carve-out from invert */
+  body.invert .no-invert { filter: invert(1) hue-rotate(180deg); }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+  /* ---------------- MASTHEAD ---------------- */
+  .masthead {
+    background: var(--ma-black);
+    color: var(--ma-white);
+    padding: 18px 22px 14px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 22px;
+    border-bottom: 1px solid var(--ma-white);
+  }
+  .masthead .brand {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .masthead .brand img {
+    width: 40px; height: 40px; display: block;
+  }
+  .masthead .brand .wordmark {
+    font-family: var(--ma-font-display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .masthead .brand .wordmark small {
+    display:block; font-family: var(--ma-font-body); font-weight: 400;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em;
+    margin-top: 4px; color: var(--ma-gray-light);
+  }
+  .masthead nav {
+    display: flex; gap: 22px; justify-content: center;
+    text-transform: uppercase;
+    font-size: 11px; letter-spacing: 0.14em;
+  }
+  .masthead nav a { color: var(--ma-gray-light); transition: var(--ma-transition); }
+  .masthead nav a:hover, .masthead nav a.on { color: var(--ma-white); }
+  .masthead .session { text-align: right; font-size: 11px; color: var(--ma-gray-light); text-transform: uppercase; letter-spacing: 0.14em; }
+  .masthead .session strong { color: var(--ma-white); font-weight: 400; font-family: var(--ma-font-display); }
+
+  /* ---------------- MASTER STRIP (under masthead) ---------------- */
+  .master-strip {
+    background: var(--ma-black);
+    color: var(--ma-white);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 22px;
+    border-bottom: 1px solid var(--ma-white);
+  }
+  .master-strip .rec {
+    display: flex; align-items: center; gap: 18px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em;
+  }
+  .rec-dot {
+    display: inline-block; width: 10px; height: 10px; background: #fff;
+  }
+  .rec.on .rec-dot { animation: recpulse 1s steps(2) infinite; }
+  @keyframes recpulse { 0%{opacity:1} 50%{opacity:0.15} 100%{opacity:1} }
+  .rec .sep { color: var(--ma-gray-dark); }
+  .rec a.toggle { cursor: pointer; }
+  .rec a.toggle:hover { color: #fff; background: #000; }
+  .rec a.toggle.active { background: #fff; color: #000; padding: 2px 6px; }
+
+  .master-strip .master-meter {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .master-meter .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ma-gray-light);}
+  .vu {
+    display: flex; gap: 2px;
+    padding: 3px; background: var(--ma-white); width: 240px; height: 18px;
+  }
+  .vu i {
+    flex: 1; background: var(--ma-black);
+    transition: opacity 0.06s linear;
+  }
+  .vu i.off { opacity: 0.08; }
+
+  .master-strip .clock {
+    text-align: right; font-family: var(--ma-font-display);
+    font-size: 14px;
+  }
+  .clock em { font-style: normal; color: var(--ma-gray-light); font-family: var(--ma-font-body); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; margin-left: 10px;}
+
+  /* ---------------- DECKS ---------------- */
+  .rig {
+    max-width: 1800px; margin: 0 auto; padding: 0 22px;
+  }
+  .booth {
+    display: grid;
+    grid-template-columns: 1fr 340px 1fr;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 22px;
+  }
+  .booth .deck, .booth .mixer { height: 100%; box-sizing: border-box; }
+  .booth .deck[data-side="a"] { border-right: 1px solid #000; }
+  .booth .deck[data-side="b"] { border-left: 1px solid #000; }
+  .deck {
+    background: var(--ma-black);
+    color: var(--ma-white);
+    padding: 18px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+  }
+  .deck[data-side="b"] { }
+  .deck .corner {
+    position: absolute; top: 10px; font-family: var(--ma-font-display);
+    font-size: 11px; letter-spacing: 0.3em;
+  }
+  .deck .corner.tl { left: 16px; }
+  .deck .corner.tr { right: 16px; color: var(--ma-gray-light); font-family: var(--ma-font-body); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;}
+
+  /* Track info — now a horizontal row at the top */
+  .track-info { display: flex; flex-direction: row; gap: 14px; padding-top: 22px; align-items: flex-start; }
+  .track-info .artwork-wrap { flex: 0 0 110px; }
+  .track-info .meta-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .artwork {
+    width: 110px; height: 110px; background: #fff;
+    position: relative; overflow: hidden;
+  }
+  .artwork img.logo-glitch {
+    width: 100%; height: 100%; object-fit: cover;
+    mix-blend-mode: normal;
+    filter: contrast(1.2);
+  }
+  /* Procedural "glitch" strata */
+  .artwork .glitch-strip {
+    position: absolute; left: 0; right: 0; height: 6%;
+    mix-blend-mode: difference;
+  }
+  .artwork .glitch-hue {
+    position: absolute; inset: 0;
+    mix-blend-mode: screen;
+    opacity: 0.35;
+  }
+  .artwork.idle { animation: glitch-flash 3.5s steps(8) infinite; }
+  @keyframes glitch-flash {
+    0%,100% { transform: translate(0,0); }
+    12% { transform: translate(-2px,0); }
+    24% { transform: translate(1px,-1px); }
+    36% { transform: translate(0,1px); }
+    48% { transform: translate(-1px,0); }
+    60% { transform: translate(2px,0); }
+  }
+  .track-info h2 {
+    font-family: var(--ma-font-display); font-size: 18px; font-weight: 700;
+    margin: 4px 0 0; line-height: 1.1; color: #fff;
+  }
+  .track-info .artist { font-family: var(--ma-font-display); font-size: 13px; color: var(--ma-gray-light); }
+  .track-info .contrib {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em;
+    color: var(--ma-gray-light); padding-top: 4px; border-top: 1px solid #333;
+  }
+  .track-info .contrib em { font-style: normal; color: #fff; }
+
+  /* Waveform column */
+  .wave-col { display: flex; flex-direction: column; padding-top: 6px; }
+  .wave-header {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px;
+    align-items: baseline; padding: 0 2px 8px;
+  }
+  .wave-header .stat {
+    font-family: var(--ma-font-display);
+    font-size: 13px;
+  }
+  .wave-header .stat em { font-style: normal; color: var(--ma-gray-light); font-family: var(--ma-font-body); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; margin-right: 6px; }
+  .wave-header .stat.big { font-size: 28px; letter-spacing: -0.01em; }
+  .wave-header .stat.big em { display: block; font-size: 10px; margin: 0 0 2px; }
+  .wave-header .center { text-align: center; }
+  .wave-header .right { text-align: right; }
+
+  .waveform {
+    position: relative; width: 100%; height: 92px;
+    background: var(--ma-black); border: 1px solid var(--ma-white);
+    overflow: hidden; cursor: crosshair;
+    user-select: none;
+  }
+  .wave-bars { position: absolute; inset: 0; display: flex; align-items: center; gap: 1px; padding: 4px; }
+  .wave-bars i {
+    flex: 1; background: var(--ma-white);
+    min-width: 1px;
+  }
+  /* played half — stays solid, unplayed half dimmed */
+  .wave-bars i.past { opacity: 0.35; }
+  .wave-playhead {
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: var(--ma-white); left: 50%;
+    box-shadow: 0 0 0 1px var(--ma-black);
+  }
+  .wave-beat {
+    position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ma-gray-dark);
+    pointer-events: none;
+  }
+  .wave-beat.strong { background: var(--ma-gray-light); }
+
+  .wave-time {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 6px;
+    font-family: var(--ma-font-display); font-size: 12px;
+  }
+  .wave-time .mid { text-align: center; color: var(--ma-gray-light); font-family: var(--ma-font-body); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; }
+  .wave-time .right { text-align: right; color: var(--ma-gray-light); }
+
+  /* Transport row — horizontal under the waveform */
+  .transport-col { padding-top: 0; display: flex; flex-direction: column; gap: 10px; }
+  .transport {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  }
+  .transport-extras {
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px;
+  }
+  .btn {
+    font-family: var(--ma-font-body);
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 10px 8px;
+    background: transparent; color: #fff;
+    border: 1px solid #fff;
+    cursor: pointer; text-align: center;
+    transition: var(--ma-transition);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn:hover { background: #fff; color: #000; }
+  .btn.active { background: #fff; color: #000; }
+  .btn .tri { width: 0; height: 0; display: inline-block;
+    border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+    border-left: 7px solid currentColor;
+  }
+  .btn .sq { width: 8px; height: 8px; background: currentColor; display: inline-block; }
+  .btn.big { padding: 14px 8px; font-size: 13px; }
+
+  .loop-grid {
+    border: 1px solid #fff;
+  }
+  .loop-grid .loop-label {
+    font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ma-gray-light);
+    padding: 6px 8px; border-bottom: 1px solid #333;
+  }
+  .loop-buttons { display: grid; grid-template-columns: repeat(5, 1fr); }
+  .loop-buttons button {
+    padding: 10px 0; font-family: var(--ma-font-display); font-size: 13px;
+    color: #fff;
+    border-right: 1px solid #333;
+    transition: var(--ma-transition);
+  }
+  .loop-buttons button:last-child { border-right: 0; }
+  .loop-buttons button:hover { background: #fff; color: #000; }
+  .loop-buttons button.on { background: #fff; color: #000; }
+
+  .pitch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .pitch {
+    border: 1px solid #fff; padding: 6px 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .pitch label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ma-gray-light); }
+  .pitch .val { font-family: var(--ma-font-display); font-size: 14px; }
+  .pitch input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 14px; background: transparent; margin: 2px 0 0;
+  }
+  .pitch input[type=range]::-webkit-slider-runnable-track { height: 2px; background: var(--ma-gray-light); }
+  .pitch input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 3px; height: 14px; background: #fff; margin-top: -6px; }
+  .pitch input[type=range]::-moz-range-track { height: 2px; background: var(--ma-gray-light); }
+  .pitch input[type=range]::-moz-range-thumb { width: 3px; height: 14px; background: #fff; border-radius: 0; border: 0; }
+
+  /* ---------------- MIXER (center, stacked vertically, fills deck height) ---------------- */
+  .mixer {
+    background: var(--ma-white); color: var(--ma-black);
+    padding: 22px 18px; margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+  }
+  .mixer .eq-col, .mixer .crossfader-col, .mixer .mix-col, .mixer .fx-col { flex: 0 0 auto; }
+  .mixer .col-label {
+    font-family: var(--ma-font-display); font-size: 14px;
+    text-transform: uppercase; letter-spacing: 0.22em;
+    padding-bottom: 10px; border-bottom: 1px solid #000;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .mixer .col-label em { font-style: normal; font-family: var(--ma-font-body); font-size: 10px; color: var(--ma-gray-dark); letter-spacing: 0.18em;}
+
+  .eq-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; padding-top: 12px; }
+  .knob-row {
+    display: grid; grid-template-columns: 40px 1fr 32px; align-items: center; gap: 8px;
+  }
+  .knob-row .knob-label {
+    font-family: var(--ma-font-display); font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .knob-row .value {
+    font-family: var(--ma-font-display); font-size: 11px; min-width: 34px; text-align: right;
+  }
+  /* horizontal slider styled as an MA rail */
+  .ma-slider {
+    -webkit-appearance: none; appearance: none; width: 100%;
+    height: 14px; background: transparent; margin: 0;
+  }
+  .ma-slider::-webkit-slider-runnable-track { height: 1px; background: #000; }
+  .ma-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none;
+    width: 4px; height: 18px; background: #000; margin-top: -9px; border-radius: 0;
+  }
+  .ma-slider::-moz-range-track { height: 1px; background: #000; }
+  .ma-slider::-moz-range-thumb { width: 4px; height: 18px; background: #000; border-radius: 0; border: 0; }
+
+  .crossfader-col { text-align: center; }
+  .mix-col { text-align: center; }
+  .xfader-wrap {
+    margin-top: 10px; padding: 14px 0 10px; border-top: 1px solid #000; border-bottom: 1px solid #000;
+  }
+  .xfader-track {
+    position: relative; height: 34px; background: #fff;
+    border: 1px solid #000;
+    display: flex; align-items: center;
+    padding: 0 2px;
+    cursor: ew-resize;
+    user-select: none;
+  }
+  .xfader-track .hair { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #000; opacity: 0.2; }
+  .xfader-thumb {
+    position: absolute; top: -3px; bottom: -3px; width: 10px; background: #000;
+    left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .xfader-ends {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    margin-top: 10px;
+    font-family: var(--ma-font-display); font-size: 14px;
+  }
+  .xfader-ends .mid { color: var(--ma-gray-dark); font-family: var(--ma-font-body); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; align-self: center;}
+  .xfader-ends .right { text-align: right; }
+
+  .channel-faders {
+    margin-top: 10px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    align-items: end;
+    flex: 1;
+  }
+  .channel {
+    text-align: center;
+  }
+  .channel .c-label { font-family: var(--ma-font-display); font-size: 13px; letter-spacing: 0.2em; }
+  .channel .c-track {
+    height: 160px; position: relative; margin: 10px auto 8px;
+    width: 28px; background: #fff; border: 1px solid #000;
+    cursor: ns-resize; user-select: none;
+  }
+  .channel .c-fill {
+    position: absolute; left: 0; right: 0; bottom: 0; background: #000;
+  }
+  .channel .c-thumb {
+    position: absolute; left: -4px; right: -4px; height: 8px; background: #000;
+    pointer-events: none;
+  }
+  .channel .c-meter {
+    display: flex; flex-direction: column-reverse; gap: 1px;
+    height: 160px; width: 6px; margin: 10px 2px 8px;
+    background: #eee; padding: 1px;
+  }
+  .channel .c-meter i { flex: 1; background: #000; }
+  .channel .c-meter i.off { opacity: 0.1; }
+  .channel .c-row { display: flex; justify-content: center; gap: 6px; }
+  .channel .headphone {
+    display: inline-block; padding: 3px 6px; font-size: 9px;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    border: 1px solid #000; cursor: pointer; transition: var(--ma-transition);
+  }
+  .channel .headphone.on { background: #000; color: #fff; }
+
+  /* FX column */
+  .fx-col { }
+  .fx-unit {
+    padding-top: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .fx-select {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .fx-select button {
+    padding: 8px 0;
+    font-family: var(--ma-font-body); font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    border: 1px solid #000; border-right: 0;
+    background: #fff; color: #000;
+    transition: var(--ma-transition);
+  }
+  .fx-select button:last-child { border-right: 1px solid #000; }
+  .fx-select button.on { background: #000; color: #fff; }
+  .fx-select button:hover { background: #000; color: #fff; }
+  .fx-assign {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .fx-assign button {
+    border: 1px solid #000; padding: 6px;
+    font-family: var(--ma-font-display); font-size: 12px;
+    background: #fff; color: #000;
+    transition: var(--ma-transition);
+  }
+  .fx-assign button.on { background: #000; color: #fff; }
+  .fx-assign button:hover { background: #000; color: #fff; }
+  .fx-engage {
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid #000;
+    padding: 8px 10px;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  .fx-engage button { border: 1px solid #000; padding: 4px 10px; transition: var(--ma-transition);}
+  .fx-engage button.on { background: #000; color: #fff; }
+  .fx-engage button:hover { background: #000; color: #fff; }
+
+  /* ---------------- LIBRARY ---------------- */
+  .library {
+    background: var(--ma-white); color: var(--ma-black);
+    margin-top: 22px;
+    border: 1px solid #000;
+    grid-column: 1 / -1;
+  }
+  .library.hidden { display: none; }
+  .library-head {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 20px;
+    align-items: baseline;
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid #000;
+  }
+  .library-head h3 {
+    margin: 0; font-family: var(--ma-font-display); font-size: 14px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+  }
+  .library-head .crates {
+    display: flex; gap: 18px; font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .library-head .crates a { color: var(--ma-gray-dark); }
+  .library-head .crates a.on { color: #000; border-bottom: 1px solid #000; padding-bottom: 2px; }
+  .library-head .search {
+    border: 1px solid #000; padding: 4px 8px;
+    font-size: 11px; font-family: var(--ma-font-body);
+    background: #fff; color: #000; width: 220px;
+  }
+  .library-head .search:focus { outline: none; background: #000; color: #fff; }
+
+  .library-table {
+    width: 100%; border-collapse: collapse; font-family: var(--ma-font-body);
+    font-size: 12px;
+  }
+  .library-table thead th {
+    text-align: left; font-family: var(--ma-font-display);
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ma-gray-dark); font-weight: 400;
+    padding: 10px 14px; border-bottom: 1px solid #000;
+    background: #fff;
+  }
+  .library-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: var(--ma-transition);
+    cursor: pointer;
+  }
+  .library-table tbody tr:hover { background: #000; color: #fff; }
+  .library-table tbody tr.loaded-a td:first-child { position: relative; }
+  .library-table tbody tr.loaded-a td:first-child::before,
+  .library-table tbody tr.loaded-b td:first-child::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #000;
+  }
+  .library-table tbody td {
+    padding: 8px 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .library-table td.artist { font-family: var(--ma-font-display); font-weight: 700; }
+  .library-table td.title { }
+  .library-table td.num { font-family: var(--ma-font-display); text-align: right; }
+  .library-table td.contrib { color: var(--ma-gray-dark); font-size: 11px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .library-table tbody tr:hover td.contrib { color: var(--ma-gray-light); }
+  .library-table td.loadcell { width: 120px; text-align: right; }
+  .load-btn {
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 3px 6px; border: 1px solid currentColor;
+    margin-left: 4px;
+    transition: var(--ma-transition);
+  }
+  .load-btn:hover { background: currentColor; }
+  .load-btn:hover span { color: #fff; mix-blend-mode: difference; }
+  tbody tr:hover .load-btn { color: #fff; border-color: #fff; }
+
+  .lib-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 18px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--ma-gray-dark);
+    border-top: 1px solid #000;
+    background: #fff;
+  }
+
+  /* ---------------- FOOTER ---------------- */
+  .site-foot {
+    background: #000; color: var(--ma-gray-light);
+    padding: 20px 22px; margin-top: 22px;
+    font-size: 11px; line-height: 1.6;
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 30px;
+    border-top: 1px solid #fff;
+  }
+  .site-foot h4 {
+    font-family: var(--ma-font-display);
+    color: #fff; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  .site-foot a { color: var(--ma-gray-light); text-decoration: underline; }
+  .site-foot a:hover { color: #fff; background: #000; }
+  .site-foot kbd {
+    font-family: var(--ma-font-mono); background: #fff; color: #000;
+    padding: 1px 6px; font-size: 10px;
+  }
+
+  /* ---------------- TWEAKS PANEL ---------------- */
+  #tweaks {
+    position: fixed; right: 16px; bottom: 16px; z-index: 1000;
+    background: #fff; color: #000; border: 1px solid #000;
+    width: 280px; display: none;
+    font-family: var(--ma-font-body);
+  }
+  #tweaks.visible { display: block; }
+  body.invert #tweaks { filter: invert(1) hue-rotate(180deg); }
+  #tweaks header {
+    padding: 10px 14px; border-bottom: 1px solid #000;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  #tweaks header h5 {
+    margin: 0; font-family: var(--ma-font-display);
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+  }
+  #tweaks .tweak-row {
+    padding: 10px 14px; border-bottom: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  #tweaks .tweak-row:last-child { border-bottom: 0; }
+  .sw {
+    width: 36px; height: 18px; background: #fff; border: 1px solid #000;
+    position: relative; cursor: pointer;
+  }
+  .sw::after {
+    content: ""; position: absolute; top: 1px; left: 1px;
+    width: 14px; height: 14px; background: #000;
+    transition: left 0.15s linear;
+  }
+  .sw.on { background: #000; }
+  .sw.on::after { background: #fff; left: 19px; }
+
+  /* ---------------- RESPONSIVE ---------------- */
+  @media (max-width: 1200px) {
+    .deck { padding: 14px; }
+    .booth { grid-template-columns: 1fr 300px 1fr; }
+  }
+  @media (max-width: 1000px) {
+    .booth { grid-template-columns: 1fr; }
+    .booth .deck[data-side="a"] { border-right: 0; border-bottom: 1px solid #000; }
+    .booth .deck[data-side="b"] { border-left: 0; border-top: 1px solid #000; }
+    .channel-faders { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .track-info { flex-direction: row; }
+    .artwork, .track-info .artwork-wrap { width: 90px; flex-basis: 90px; }
+    .artwork { height: 90px; }
+    .masthead { grid-template-columns: 1fr; gap: 10px; text-align: center; }
+    .masthead nav { justify-content: center; flex-wrap: wrap; }
+    .masthead .session { text-align: center; }
+    .master-strip { grid-template-columns: 1fr; gap: 10px; text-align: center; }
+    .master-strip .clock, .master-strip .rec { justify-content: center; text-align: center; }
+    .site-foot { grid-template-columns: 1fr; }
+    .library-head { grid-template-columns: 1fr; }
+    .library-head .search { width: 100%; }
+    .transport { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+<link id="gfont-Arvo" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arvo:wght@300;400;500;600;700&amp;display=swap">
+<script src="https://cdn.jsdelivr.net/npm/music-tempo@1.0.3/dist/music-tempo.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meyda@5.6.3/dist/web/meyda.min.js"></script>
+</head>
+<body style="cursor: crosshair; font-family: Arvo;" data-cc-id="cc-1">
+
+<header class="masthead">
+  <a class="brand" href="#">
+    <img class="no-invert" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnYAAAJ2CAAAAAD3P5AlAAAACXBIWXMAAAsTAAALEwEAmpwYAAAboElEQVR42uzd3W7cRBiH8f947N3w2dKUC0aq1JPG9trORxFwABKUQiuEEEIICckn3BR+B6UNbdJk02yVfTNOn981PJrx7jv2KAHO7GslwJfVO2QHb6vFR2QHX3Yg3SE7uLI2BrKDL6uLwGoHX7YfJbKDr4NSZAdfU6tAdvA17VUS2cFXtxDZwZcNCmQHX9aVEtnB194ikB182SpIZAdXdhRFdvBlbRHIDq7M+iiRHXytKpEdnNUKZAdf1lYS2cFXtxTZwZXZIJEdfE1NJDs4s7oKZAdXZkMhkR1c2VEU2cGXtUUgO7iyqS4lsoOv/UpkB2e9AtnBl61Kiezgq94R2cGVpTaI7ODLDqLIDr6srQLZwZVZX0pkB1fWR5EdfFkdAtnBldmqlMgOvoalyA6uLPUhkB18TXWUyA6+mqXIDq4sDYXIDr7ssBDZwZe1ZSA7uLKpKSWygys7iiI7OOtDIDu4MmujRHbw1eyI7ODKUlMEsoMv6wuJ7OCrXQaygyuzPkpkB1dTF0R28GVNJDu4OjnBTnbwdViK7OCsLwLZwde0V0hkB1+rpcgOriz1UWQHXzYEkR18WbMkO/gyq6NEdnBlj4PIDr6sj2QHX2ZtKZEdXNmqEtnBWVsEsoMvWwWJ7OBrtSOygytLfSmyg6+plcgOvqypAtnBlVlbidUOvuyoENnBlw0xkB3ekPUJdrLDOxkqkR2cDTGQHXxZJ4ns4MrqJdnBW12K7ODLDiSygy/rq0B28GVtFKsdfFlXiOzgbFUEsoMva4NEdnBl3UJkB2dDGcgOvqyWRHZwZfUikB2crSqx2uGsmU7EyA6XsKEMZAdf9iiK1Q6+7KAQ2cHZQQxkB1+2UhDZwZXVC4ns4KupAtnBl/UKIju4stUiiOzg60V1ZAdPttIxsoMj66KOkR38WBuDjpEd3Nh+1EtkBzcHpU6QHZzYnoJOkB18WFPpFbKDj26p18gOHmxQ0GtkBwdTV+o0ssP22aMq6DSyw9bZftBZZIdjM7pbh+xwBXbBXdhkh+2amlLnkB22qyt1HtlhqzoFnUd2WZqSpdtg3f2wZJelf75Pt8JqqQuRXZb+/vDHf9PcmTVag+yyNEr7s99mrY1ag+yyNErxMM2btYugNcguS6OkD56mGTMbCq1FdlkaJemT39N82VHUemSXpVHH7n83pZmyvSLoEmSXo1EvxAdplsxWpS5Ddlka9dLicZql/YUuRXZZGnVid5bPd72CLkd2ORr1v89+TXMztaXehuxyNOqVe12amb2l3orscjTqteXDOc0rzIagtyK7LI06pfwhzcfVvvxPdlkaddr9P9JcWFsFXQHZ5WjUGXeepFmwK59gJ7scjTpr0aQ5sCHqSsguS6PeUH45gzmZdSHoSsguS6PeVPycMrfJRIzssjTqnLvZ/288LHVlZJejUed9/lPO59wtNZvssGSXo1EXyXleYU3UBsguN+uzi/spW+2ONkB2WRp1oU+fpyxZGgptguyyNGpNd7+lHE2HhTZCdlkatcbutyk/tlcGbYbscjRqneqLlBmzrtSGyC5Lo9ZaHKZ3cMvfESO7bWen3T9TVvoQlCeyu8bsdPd5yoZNdaY7LNldc3a6s5ey0SyVLbK71uy0bKaUA8t4hyW7a89OxZOUA+sLZYzsriu7vN6fbZcZr3Vkd/3ZafeppZtllvGvCbLbTnaKtaUbZX3WSx3ZbSU7FV+lm2RdJLtbZtQVlM/Seu/tRIzstpydPv4l3ZjD/Ksju+1kp91nU7oZTZH7Dkt2W8tOoU43wepcp/9k55GdYpduQLejOSC7a8ouh/cYLfWzWOvIbmOj8u1uGmbwWEd2W85O975JnuzRguxuqVEbWDxIp71nX5wgO/fs/M+52+O5LHVkt+3sdO+v5MP67CdiZOeWne49Tyfe2xPsZOefnT55mLZvTs91ZOeRnRYO988Oc5iIkZ1Ddo7fXbT/2LvX6KrKO4/jv50LwUC4KoiFARciIjeHsahQRSl3ULC1RTtT11C0NIGQOjrj0hmdGdo6VOSSEBjsBde0Za1ZupTazjhqKyzK4Ap1OnUpVO5gAamQe0JOLuc8/y4kOeRyLvvy7JOcZ/8+75O8+a69s/fzf55d3KMn2JldSrNL2fd6itNjRYzZpTY7XOPj9U5Jej1NMLuUZYdM//YxqmKkH2aXkuxgvejbBHvarIgxu5Rnh947xQdKbUq/OyyzS1126Puq6Ke2pdszLLNLbXYY+KoSzVRaTLAzu+7MDpkvKN0T7Ol5rWN2qcwOWetFq9JeSFPMLoXZYcAbWqtLp5kTZtd92WHQL0WXSDq+r2N23ZIdBm3VdgZ72t5hmV3Ks0PO90WLNJt0Ynbdmx2yfyjeqa1Ia8wu1dlh0NsaJtiz0/Zpgtl1T3YY/PNgnDjB7HpUdsj9rsnnEjO7HpodsrcpcU1tSdMVMWbXzdkh0/19Vm1K++iYnf/Z6f7+bEk6v69jdt2bHQa77G5jmj/DMrtuzQ5ZJWE3k04wArPrruyALS72TfTsr5wwuzTILvd1cag4G2Zgdt2XHfo7mzeOpPmKGLPrGdlhwCuO3pyk73wds+tJ2SFrgwrOihiz6ynZIft52zMnBlXH7Lo5O/R/U2zZas4dltmlIDst35+NbIJJ1TG7bs8OA9cnr26DKW9OmF1PyQ45SbtL96lOZtcDs0P2T5PM15l1h2V2PSM7DHoj4YpYOp7pxOx6fna4+nWJa4N51TG7npEdrnouIjGpEhiI2fWM7JCxLQBviZldT8sOWf9l+Doss+uJ2SHv5Ri7dYy81jG7HpQd+u8068QJZpcW2SFrS7jjzIlx7+uYnYbs9NsoVyhjZomZXQ/Prs8vJKokB8Zidm6zs+CHwa+buyLG7DRkN3R6Nnww8GdySZp9H5bZpSq7iYdXww9ZG0VEmbELm9lpz+7GQ02FsKBfzguithgdHbPzkN1HEsqHHwb86geGviVmdjqyk4aH4Iep/WA4ZuclO6laBQu63frxLqOfJ5id1+zk4reh24iTIvNgNmbnLTsJFUCvm4+LyH4+UlCi7CS0zIJG4w+KiNTdCaMxO6/ZSWg+9Jn0oXxmM4zG7DxnJw0FsKDHhEq57MRYmIzZec9OGpdb0GLUMWkzFyZjdhqyk9AK6DCx3a9cZ/D8CbPTk5005sOCV6Pa/8YLw2EwZqclO6maD69uOCXtPQCDMTs92amGfHgzuU46eDftv/DE7HzPTiTkbZ1s7EHpKDQB5mJ2urKThiK4N/KIdBJZA3MxO23ZSWg53Bp3PNZfMhez05ednH/IsuDG9GPS1ZnPw1jMTmN2buc+J5yQWJ6BsZidzuykaSUsOHXDYYnpF31gKmanNTtpfMSCQ8NPSGzHx8FUzE5vdtLwAJyZdFjiuQ+mYnaas5NqZ+/vppyRuMzdycPsdGcnDath35CPJb6DJnwom9n5nl10/s6ucSclgao8GIrZ6c9OQt+EBTtuPiiJNN8MQzE7H7KT+rmwY9wfJKHIChiK2fmRnapfieQm10gS78BQzE5rdk7m3McelmTOm7pvkdlpzc7BnPv4A5JU7SSYidn5lJ00fQux2Pvx6JoHzMTs/MpOGr6VgbjGnhQb1EswE7PTnp2d3V8Tq8WWMpiJ2fmYXWQrYrvxoNhzZCiMxOx8zE7C2xHLkBNi07m/hJGYnZ/ZSfhf0NVNJ8WuusUwErPzNTup/w46+8JxsS1SACMxO3+zE9mGjsYcEweeM3O3LLPzO7tIaS+0M/aoOPFjM2efmJ3f2YmszULUDUfFkf82c/aJ2fmfnRSgzaSD4kzZIJiI2aUgu1AxLrv1jDh0ehhMxOxSkJ2oUlwy5JQ4dWEETMTsPGTnwAs5wI0nxDH1VzARs0tNdpF1mHRQnFNmjj4xu9RkJxenlIkDhp9hzOxSlF0xFleKC48a+b6Y2aUkO7UpE1gpLnyD2ZHb7Ep6A0Ahs2N2KctOyeZMfGYrs2N2qcoushGtri4Tp5YzO3KTndrYy4r+0BFx6O+NPH6H2fmcnVIlWbji7jpx5hFe7chFdi9aaO8x/m/H7HzPTm3OtNBe71eYHbPzNzsVWZ+JTkZ+yOyYnb/Zbc1CFwUt4sA3mR05zK40w0IXvfeIA/NgImbnX3aqOAOxTGwR29QtMBGz8y07taE3YspYI/aZuT+b2fmUnZKNmYgjb6/YdZ7TxeQkuy2Ib0Gz2PTxtTARs/MnO1XSy0JcA/fY/nMDYSJm50d2ShVnIZFHmsWeV3NhImbnR3aREgsJXfWJ2FOaDRMxOx+ya3kuw0Jiz4fFlr+DkZid9uxUc5GFZAbUih0NX4WRmJ327MIrLST3kthx/jYYidlpz24l7JgmdhwZAiMxO83ZhVbClkHviogE9TM8zE5vds2rLdjzbUku/DzMxOx0ZqekEHbNrJSkLi6EmZidzuya82HbgDJJqqIPzMTsNGbXssqCfdvs/DFDMTtt2alIoQUHHqyTJNRyGIrZacsussKCE9edkSRC18FQzE5XdqrAgjO/lyRO58BQzE5PdqqpyIJD2yWJ/8yCoZidnuyaV1pwqkiS+BpMxex0ZKck34JjMyWxQ2NgKmanI7vGQrgwWRL7sZFbZJmdhuyiK2IujJaEapbAWMzOc3ZK3FWHa8OSyP9fBWMxO8/ZtayAO0PqJYHIEzAXs/OaXbjAgjt9P5AEzhp8sWN2HrNT4SILLuV9KAk8DoMxO0/ZqXC+BbfyDkh8lSNhMGbnKTvJt+BPdk8beWYxs9OQnWpaBfiT3QUzvzXG7DRk11xo+ZXdjyyYjNm5zW7MR9I21an/SbbGzO95MjvP2Y0/+hi8GXha4imF2Zid2+xGfjkH3gxTEse5/jAbs3Ob3YRcePS5iMTWdA8Mx+xcZnf3rwfBo5sljlJjxzuZnbfs7mzanQePbpPYjo+F6Zidq+wW1cju/vBoscQUXgPjMTs32c2vFA3ZPSUx/Z/xt1hm5yq7OU2iI7v/kVg+GQzzMTvn2c2vFx3Z9TomMTSY+dkdZufNHiwoFy3ZTfxUugo/afaqGLNzZ+/0StGT3aMN0tXLvRAEzM4R1Vx0VjRl96J0dXAAAoHZOdKUn9moKbuh70sXFaMRDMzOCVVkXdOgKbt7KqSzc3cjIJidfSpSYEFbdk9LZ41LERTMzr7ICgvassv7eYyjQAOD2dnWUmhBX3Zj66Sj2r+2AvHuhNk5oZpXWdCY3ZPSUSg4d9iAZqdUzZ/273t57bp169bu3Fd2rkbsyLegM7vjnap7JDiXuuBlV3Vs70//Ye6EvrnZ2VmZl2RlZ+f2nTT/n7a/e6xeEmguBHRm98WQtHd+GZidmSJ//OWzC0YjjozRX1n71icSR2g19Gb3prR3djaCJSjZqd8/MWNCPyQ2cPKsdYcklpWW3uxGVEk7709BwAQiu6ZzG6b0zYAdWf2m7aiISAcqvBLQm90TLRIVeWMogiYA2TV99FQunBj9w1PSXvNKaM5u8HsS1bzF6GMnAppdeNeyoXDqhmf/IFGRIkt3dvMapU3VCnOPig1sdmr/PHd1XPfP55VI25lOmrPLeUtaqVN3IYjMzu7ol+CWZRVWiYhEHrWgOTvrS9KqeR2CyeTszq4ZYME96/qfNEpLkQXd2UUPofjdkkC9rAtGdnvHwaPMpb8rtKA9u3+Ty35yLYLK2Oxavns1vLtjDLRnN/6Pcknl100+nDig2b2/KAveLbl45sE+mrOzNoqInP3RXyDADM2uOBca3FsvIjsG6s1uaq2IvDUBgWZkds3/Ch3ml8slb4/UmV2fXSIfLctDsJmYXeVy6DCzWi47eqvG7J6SC88EZHtYsLKr+CJ0mBGSNrX3ZOjK7tbK14KyOyxY2X3wBeiw9GKHbQ6asutX9ADIwOxOT4EOs2ukvVCBnuxyAnCaUxCzuzgdOtzeLJ08bHXOzvTzhZmdbRUzoMPcJums8WFmx+xiq50FHe4rl64aC5gds4ul7iHocG+dxFI3l9kxu67Uv0OHWRcltgPDmB2z6+K93tBgbo3Es6cPs2N2nXw6GhosrJB4lJQwO2bXUdNSaLCoUhIIPczsmF0Hz0ODmWFJqGLqIGbH7K7YPwDezb8oSbw5kNkxu6jG6fBuTrkk9bflzI7ZtdkH7+5okuSqG5kds2vV+Hl4dn+T2MLsmF2rJzN0TLAzOwDMzrYDI+DV7EphdpcwO7vUM/BqVp0wu88wO7vOjIBHc+qE2V3G7OxaA4+W1gqza8XsbKrqB29mVwuza8Ps7FHPZsKTO5qF2UUxO3sio+DJnCZhdlcwO3sO5MGL+y4Is2uH2dnznUx4MLtRmF17zM6WijvhwawmYXYdMDtb3h8I9xZWCbPriNnZ8hLcm1shzK4TZmdH3RK4dm+NMLvOmJ0d5/rCrXlhYXZdMDs73oFbC6qF2XXF7GwIPw6X5pYLs4uB2dnQPBXu3N4kzC4WZmdDZR+4YS1pEWYXC7OzY5/rCXZmFxuzs2E73LirVphdHMzOhsfgwsyQMLt4mJ0NfwPnFlYLs4uL2dlwNxz7SrUwu/iYXXKVk9ycwc7sEmB2yZ0fD4dmNAizS4TZJXf2Jjgzr06YXULMLrmy6+CEtbhcmF1CzM6G/x0GJ2ZGhNklweyS2+cou3tahNklw+w0Z7eoSphdUsxOb3Yzq4TZJcfskts7FHYtqhdmZwOzS+7EGNvVtYher1iggGZ3YQLsWVCuf8caBTW7T8fb3pmo23+AgpqdzIAddzWIbuoFUGCzuw823B8S7dT3QIHNrtBCUovqRL+Wx0GBzW4zkppWJz5oXAIKbHa/QjIzmsUP9RNAgc3udDYSu7fat0MwKLDZNd6EhO6vF3/szgAFNrvwMiQys1588o+g4GanXkECc+rFL3eAgpudfIz4FlSIX0IcBAh0dlW3I57F5eKbl3uBApxdZB3imCM+WgQKcnayNwsxzQiJfyqGgwKd3ZlbEMvEs+KjnX1Agc5OHkUMww+LjyKrQQHP7u1cdDHupPjp9DhQwLNrHIrObqkUP6kdoKBnpx620NFNB8RX9dNAQc9ODmWhgzGHxF9HQcxOFqK9G4+Lv9RaELOT3/bBFdOOic/ODAYxOwl/A1GTTorfVoGYnYjsGoRWI46K3z64HsTsLvkyLht+Snz3NIjZfebIMFxyy2Hx3Xt5IGZ3WSkATD4nvgvfBmJ2raqvTc0dVtaBmF3Ua1kTjon/yj8HYnZR5V/bLf5TBdwwxuzaWd//Z0p891pvELOL2gTkvid+OzIExOzaqJJsAKOqxF/1U0HMro3a1MsCgAci4qfmr/LcWGYXpba05pCzXfy0lo8TzC5KlURzyN0t/ikbCmJ2rdSGDAttrnpV/PIOq2N2UWpzJtrpt0P8oOSNq0HMrs3WbHQw4Dfih13DQMyulSqGhY6u/63o95trQcyuVWR9FroYtVN0+/VYELNrU5yDGPK+p0SrkmtAzK5NKWLLzA+JPvVP5YCYXStVmol48mtEl5oHQcyujdrQy0IcFmbsV6LFBwtAzK6VUpsykEj/r9eKd7Wr+LqO2V2htmUgibEfildlk0HMLkptyrCQTP/v/0m8qNzETWLM7gqlSrJgx6QfiHs7pnLihNm1V9wL9uTMLhN39szM/XN7988iSRGHcbx2d/YPnLpcKporeOgqRmck53sQX4IGooGRmSbCTU/3dM/sHoKBgZgLF4qYmQkGgokaGOiaLRoo/ZTiIOzu6NzO7t4zNVXfz2v4MjVdv+rqALI7ZRQ2wkXtPvvpz3FZx5/d5qUJsjtDzSAs5YUPv4/L+LF7KYDszmr2wrKeeePLeFFfvXMrgOzOkLrNsLyNRw/GP5z8ERf78+SnD57f54UJsjuvbzbDZb34/v3vfvlN8T/9fvzt/bu3A8hunqrtjXAFu7defffjL74+PpHijHTy6zeff/Lea89tB4RAdnOkdhCubHDz8acOXr7z+ttv/e3NV+4cPP3ETZL7F9nN0b2tcG02/sEfuXPI7jw1VJKJ9clO/XAQkIf1yS52fDk4G+uTXcsKm491yU7jrYBsrEt2FaP5nKxFdoo1R9+ysh7ZHVJdXtYhO40HPE3kJf3spDH7dblZg+x4hs1P+tmN2K/LT+LZSTUrbIYSzy62XHuTo6SzU2w3WWFzlHR2fUV0eUo6u2qX7PKUbnZSy85JrhLO7oifumwlm53GW2SXrUSzU1+xX5exRLOLh1SXs0Sz69ivy1qK2Umc6szcpbLjBDtyy05xxH5d7hLMruNvXfaSy04NE7H8LZsdJ9iRX3Z9y09dCdLKTjUTsSIslR0n2JFhdlMu1SzEUtkxEUNu2fVDoitGOtnVvCNWjkSyU2x5mihIKtlNAgqSRnZqdvhjV5IUspO4g70wSWR3xKnOwiSQnTomYqV5cHacYEeG2Y34ykl5Vp4dZ05KtOLs1AQUaGF2TMSQX3aKY046lWmV2fWssKVaYXaq+cpJqVaXnWrewi7WguyYiCG37DThBHvB/ic7TrAjv+zEzknZVpNdxzNs2VaRncYBZVtBdhpxp1PpVpDdkP91xbNnp2lA8dzZacLTBM5lx0QMGWanhupgz47viGEuO06wI2SXnRreEYM9u5Z7TuDOTlWgOpiz02ib6uDOjpvEMJ8dEzHMZJSdpuzXwZ2d7vLeBNzZacJEDPbsptwQC3d2ativgzu7vuIsMezZcVcn7NmpY4WFOzu+wI4VZFczEYM7O9VEB3d2arlJDO7sVDMRgzs7tUzEYM9uyi4xFmXHCXacssbZqWK/DvbsxnxbB/bsugCYs+s7nmHhzk5D3kyEOTupYzYBe3ZHrLC4SHZMxHDK+mUnTrDDn11sqA727FomYnBnp4aJGOzZNXsBsGYnjVhgYc9uzC4x3NmpZiIGc3ZSy9ME7NndYyIGd3YabrDCwpudVLPCwp1d7DjBDnt2LSss3Nn1fKkT/uyGrLAwZ6fI7TrwZ3dIdXBnp2bA0wS82annxglcPjtuEsMpiWfHfh3c2Uk1v3VwZxdb9utgzk5xxFvYsGc3Yr8O9uzqPX7r4M1O7JzAn11/xE8d3Nmp2iI7XD07TrBjKf7s4iHVwZ5dx34dzNmpZ78O9uxixUQM5uwU2a+DP7uOv3VwZ6dml+zgzU58MxHXmx0rLJZgzE4tEzFcb3ZMxGC3H/juP5Zgy27ECgt3dqqIDtefHV85wUL+7BS5gx327PpJAB5Gdnz3H3b7gf06LODP7ohTnXBnp479OpizU1/xWwd7djUTMdizY4WFPTuNA+DOruYdMdizq/hfh4ecHSss5vizU8tEDO7suIMdjuyYiGGOOTvV7NfBkR0n2DHHmp3GOwEwZ9fxpU64s+vZr0NwZ6fhDr91cGfXMBHDjC87TQMwY8tOE54mMOPLThUTMcz4slPDRAwzxuymTMTgM8tOTaA6WO2HfshEDGY3wkeP3NgHnB578i/G6xKhAk7euwAAAABJRU5ErkJggg==" alt="Musique Approximative">
+    <div class="wordmark">MUSIQUE APPROXIMATIVE<small>TABLE DE MIXAGE · V.0</small></div>
+  </a>
+  <nav>
+    <a href="#" class="on">Mixer</a>
+    <a href="#">Parcourir</a>
+    <a href="#">Radio</a>
+    <a href="#">Contributeur⋅rice⋅s</a>
+    <a href="#">À propos</a>
+  </nav>
+  <div class="session">
+    En session&nbsp;: <strong id="session-name">nuit du 19.04</strong>
+  </div>
+</header>
+
+<section class="master-strip">
+  <div class="rec" id="rec">
+    <span><span class="rec-dot"></span>&nbsp; ENREGISTREMENT <em id="rec-time" style="font-family: var(--ma-font-display); font-style: normal; color: #fff; letter-spacing: 0.1em; margin-left: 8px;">00:00</em></span>
+    <span class="sep">/</span>
+    <a class="toggle" id="rec-toggle">Démarrer</a>
+    <span class="sep">/</span>
+    <span>Diffusion <em id="broadcast" style="font-style: normal;">—&nbsp;hors antenne</em></span>
+    <span class="sep">/</span>
+    <a class="toggle" id="broadcast-toggle">Mettre à l'antenne</a>
+  </div>
+  <div class="master-meter">
+    <span class="label">Master</span>
+    <div class="vu" id="vu-master"></div>
+  </div>
+  <div class="clock">
+    <span id="clock">--:--:--</span><em>heure locale</em>
+  </div>
+</section>
+
+<main class="rig">
+<div class="booth">
+
+  <!-- DECK A -->
+  <section class="deck" data-side="a" data-screen-label="Deck A">
+    <span class="corner tl">DECK&nbsp;A</span>
+    <span class="corner tr">Chargé depuis <em style="font-family: var(--ma-font-display); font-style: normal; color: #fff;" id="crate-a">Carton — avril 2026</em></span>
+
+    <div class="track-info">
+      <div class="artwork-wrap">
+        <div class="artwork" id="art-a">
+          <img class="logo-glitch no-invert" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnYAAAJ2CAAAAAD3P5AlAAAACXBIWXMAAAsTAAALEwEAmpwYAAAboElEQVR42uzd3W7cRBiH8f947N3w2dKUC0aq1JPG9trORxFwABKUQiuEEEIICckn3BR+B6UNbdJk02yVfTNOn981PJrx7jv2KAHO7GslwJfVO2QHb6vFR2QHX3Yg3SE7uLI2BrKDL6uLwGoHX7YfJbKDr4NSZAdfU6tAdvA17VUS2cFXtxDZwZcNCmQHX9aVEtnB194ikB182SpIZAdXdhRFdvBlbRHIDq7M+iiRHXytKpEdnNUKZAdf1lYS2cFXtxTZwZXZIJEdfE1NJDs4s7oKZAdXZkMhkR1c2VEU2cGXtUUgO7iyqS4lsoOv/UpkB2e9AtnBl61Kiezgq94R2cGVpTaI7ODLDqLIDr6srQLZwZVZX0pkB1fWR5EdfFkdAtnBldmqlMgOvoalyA6uLPUhkB18TXWUyA6+mqXIDq4sDYXIDr7ssBDZwZe1ZSA7uLKpKSWygys7iiI7OOtDIDu4MmujRHbw1eyI7ODKUlMEsoMv6wuJ7OCrXQaygyuzPkpkB1dTF0R28GVNJDu4OjnBTnbwdViK7OCsLwLZwde0V0hkB1+rpcgOriz1UWQHXzYEkR18WbMkO/gyq6NEdnBlj4PIDr6sj2QHX2ZtKZEdXNmqEtnBWVsEsoMvWwWJ7OBrtSOygytLfSmyg6+plcgOvqypAtnBlVlbidUOvuyoENnBlw0xkB3ekPUJdrLDOxkqkR2cDTGQHXxZJ4ns4MrqJdnBW12K7ODLDiSygy/rq0B28GVtFKsdfFlXiOzgbFUEsoMva4NEdnBl3UJkB2dDGcgOvqyWRHZwZfUikB2crSqx2uGsmU7EyA6XsKEMZAdf9iiK1Q6+7KAQ2cHZQQxkB1+2UhDZwZXVC4ns4KupAtnBl/UKIju4stUiiOzg60V1ZAdPttIxsoMj66KOkR38WBuDjpEd3Nh+1EtkBzcHpU6QHZzYnoJOkB18WFPpFbKDj26p18gOHmxQ0GtkBwdTV+o0ssP22aMq6DSyw9bZftBZZIdjM7pbh+xwBXbBXdhkh+2amlLnkB22qyt1HtlhqzoFnUd2WZqSpdtg3f2wZJelf75Pt8JqqQuRXZb+/vDHf9PcmTVag+yyNEr7s99mrY1ag+yyNErxMM2btYugNcguS6OkD56mGTMbCq1FdlkaJemT39N82VHUemSXpVHH7n83pZmyvSLoEmSXo1EvxAdplsxWpS5Ddlka9dLicZql/YUuRXZZGnVid5bPd72CLkd2ORr1v89+TXMztaXehuxyNOqVe12amb2l3orscjTqteXDOc0rzIagtyK7LI06pfwhzcfVvvxPdlkaddr9P9JcWFsFXQHZ5WjUGXeepFmwK59gJ7scjTpr0aQ5sCHqSsguS6PeUH45gzmZdSHoSsguS6PeVPycMrfJRIzssjTqnLvZ/288LHVlZJejUed9/lPO59wtNZvssGSXo1EXyXleYU3UBsguN+uzi/spW+2ONkB2WRp1oU+fpyxZGgptguyyNGpNd7+lHE2HhTZCdlkatcbutyk/tlcGbYbscjRqneqLlBmzrtSGyC5Lo9ZaHKZ3cMvfESO7bWen3T9TVvoQlCeyu8bsdPd5yoZNdaY7LNldc3a6s5ey0SyVLbK71uy0bKaUA8t4hyW7a89OxZOUA+sLZYzsriu7vN6fbZcZr3Vkd/3ZafeppZtllvGvCbLbTnaKtaUbZX3WSx3ZbSU7FV+lm2RdJLtbZtQVlM/Seu/tRIzstpydPv4l3ZjD/Ksju+1kp91nU7oZTZH7Dkt2W8tOoU43wepcp/9k55GdYpduQLejOSC7a8ouh/cYLfWzWOvIbmOj8u1uGmbwWEd2W85O975JnuzRguxuqVEbWDxIp71nX5wgO/fs/M+52+O5LHVkt+3sdO+v5MP67CdiZOeWne49Tyfe2xPsZOefnT55mLZvTs91ZOeRnRYO988Oc5iIkZ1Ddo7fXbT/2LvX6KrKO4/jv50LwUC4KoiFARciIjeHsahQRSl3ULC1RTtT11C0NIGQOjrj0hmdGdo6VOSSEBjsBde0Za1ZupTazjhqKyzK4Ap1OnUpVO5gAamQe0JOLuc8/y4kOeRyLvvy7JOcZ/8+75O8+a69s/fzf55d3KMn2JldSrNL2fd6itNjRYzZpTY7XOPj9U5Jej1NMLuUZYdM//YxqmKkH2aXkuxgvejbBHvarIgxu5Rnh947xQdKbUq/OyyzS1126Puq6Ke2pdszLLNLbXYY+KoSzVRaTLAzu+7MDpkvKN0T7Ol5rWN2qcwOWetFq9JeSFPMLoXZYcAbWqtLp5kTZtd92WHQL0WXSDq+r2N23ZIdBm3VdgZ72t5hmV3Ks0PO90WLNJt0Ynbdmx2yfyjeqa1Ia8wu1dlh0NsaJtiz0/Zpgtl1T3YY/PNgnDjB7HpUdsj9rsnnEjO7HpodsrcpcU1tSdMVMWbXzdkh0/19Vm1K++iYnf/Z6f7+bEk6v69jdt2bHQa77G5jmj/DMrtuzQ5ZJWE3k04wArPrruyALS72TfTsr5wwuzTILvd1cag4G2Zgdt2XHfo7mzeOpPmKGLPrGdlhwCuO3pyk73wds+tJ2SFrgwrOihiz6ynZIft52zMnBlXH7Lo5O/R/U2zZas4dltmlIDst35+NbIJJ1TG7bs8OA9cnr26DKW9OmF1PyQ45SbtL96lOZtcDs0P2T5PM15l1h2V2PSM7DHoj4YpYOp7pxOx6fna4+nWJa4N51TG7npEdrnouIjGpEhiI2fWM7JCxLQBviZldT8sOWf9l+Doss+uJ2SHv5Ri7dYy81jG7HpQd+u8068QJZpcW2SFrS7jjzIlx7+uYnYbs9NsoVyhjZomZXQ/Prs8vJKokB8Zidm6zs+CHwa+buyLG7DRkN3R6Nnww8GdySZp9H5bZpSq7iYdXww9ZG0VEmbELm9lpz+7GQ02FsKBfzguithgdHbPzkN1HEsqHHwb86geGviVmdjqyk4aH4Iep/WA4ZuclO6laBQu63frxLqOfJ5id1+zk4reh24iTIvNgNmbnLTsJFUCvm4+LyH4+UlCi7CS0zIJG4w+KiNTdCaMxO6/ZSWg+9Jn0oXxmM4zG7DxnJw0FsKDHhEq57MRYmIzZec9OGpdb0GLUMWkzFyZjdhqyk9AK6DCx3a9cZ/D8CbPTk5005sOCV6Pa/8YLw2EwZqclO6maD69uOCXtPQCDMTs92amGfHgzuU46eDftv/DE7HzPTiTkbZ1s7EHpKDQB5mJ2urKThiK4N/KIdBJZA3MxO23ZSWg53Bp3PNZfMhez05ednH/IsuDG9GPS1ZnPw1jMTmN2buc+J5yQWJ6BsZidzuykaSUsOHXDYYnpF31gKmanNTtpfMSCQ8NPSGzHx8FUzE5vdtLwAJyZdFjiuQ+mYnaas5NqZ+/vppyRuMzdycPsdGcnDath35CPJb6DJnwom9n5nl10/s6ucSclgao8GIrZ6c9OQt+EBTtuPiiJNN8MQzE7H7KT+rmwY9wfJKHIChiK2fmRnapfieQm10gS78BQzE5rdk7m3McelmTOm7pvkdlpzc7BnPv4A5JU7SSYidn5lJ00fQux2Pvx6JoHzMTs/MpOGr6VgbjGnhQb1EswE7PTnp2d3V8Tq8WWMpiJ2fmYXWQrYrvxoNhzZCiMxOx8zE7C2xHLkBNi07m/hJGYnZ/ZSfhf0NVNJ8WuusUwErPzNTup/w46+8JxsS1SACMxO3+zE9mGjsYcEweeM3O3LLPzO7tIaS+0M/aoOPFjM2efmJ3f2YmszULUDUfFkf82c/aJ2fmfnRSgzaSD4kzZIJiI2aUgu1AxLrv1jDh0ehhMxOxSkJ2oUlwy5JQ4dWEETMTsPGTnwAs5wI0nxDH1VzARs0tNdpF1mHRQnFNmjj4xu9RkJxenlIkDhp9hzOxSlF0xFleKC48a+b6Y2aUkO7UpE1gpLnyD2ZHb7Ep6A0Ahs2N2KctOyeZMfGYrs2N2qcoushGtri4Tp5YzO3KTndrYy4r+0BFx6O+NPH6H2fmcnVIlWbji7jpx5hFe7chFdi9aaO8x/m/H7HzPTm3OtNBe71eYHbPzNzsVWZ+JTkZ+yOyYnb/Zbc1CFwUt4sA3mR05zK40w0IXvfeIA/NgImbnX3aqOAOxTGwR29QtMBGz8y07taE3YspYI/aZuT+b2fmUnZKNmYgjb6/YdZ7TxeQkuy2Ib0Gz2PTxtTARs/MnO1XSy0JcA/fY/nMDYSJm50d2ShVnIZFHmsWeV3NhImbnR3aREgsJXfWJ2FOaDRMxOx+ya3kuw0Jiz4fFlr+DkZid9uxUc5GFZAbUih0NX4WRmJ327MIrLST3kthx/jYYidlpz24l7JgmdhwZAiMxO83ZhVbClkHviogE9TM8zE5vds2rLdjzbUku/DzMxOx0ZqekEHbNrJSkLi6EmZidzuya82HbgDJJqqIPzMTsNGbXssqCfdvs/DFDMTtt2alIoQUHHqyTJNRyGIrZacsussKCE9edkSRC18FQzE5XdqrAgjO/lyRO58BQzE5PdqqpyIJD2yWJ/8yCoZidnuyaV1pwqkiS+BpMxex0ZKck34JjMyWxQ2NgKmanI7vGQrgwWRL7sZFbZJmdhuyiK2IujJaEapbAWMzOc3ZK3FWHa8OSyP9fBWMxO8/ZtayAO0PqJYHIEzAXs/OaXbjAgjt9P5AEzhp8sWN2HrNT4SILLuV9KAk8DoMxO0/ZqXC+BbfyDkh8lSNhMGbnKTvJt+BPdk8beWYxs9OQnWpaBfiT3QUzvzXG7DRk11xo+ZXdjyyYjNm5zW7MR9I21an/SbbGzO95MjvP2Y0/+hi8GXha4imF2Zid2+xGfjkH3gxTEse5/jAbs3Ob3YRcePS5iMTWdA8Mx+xcZnf3rwfBo5sljlJjxzuZnbfs7mzanQePbpPYjo+F6Zidq+wW1cju/vBoscQUXgPjMTs32c2vFA3ZPSUx/Z/xt1hm5yq7OU2iI7v/kVg+GQzzMTvn2c2vFx3Z9TomMTSY+dkdZufNHiwoFy3ZTfxUugo/afaqGLNzZ+/0StGT3aMN0tXLvRAEzM4R1Vx0VjRl96J0dXAAAoHZOdKUn9moKbuh70sXFaMRDMzOCVVkXdOgKbt7KqSzc3cjIJidfSpSYEFbdk9LZ41LERTMzr7ICgvassv7eYyjQAOD2dnWUmhBX3Zj66Sj2r+2AvHuhNk5oZpXWdCY3ZPSUSg4d9iAZqdUzZ/273t57bp169bu3Fd2rkbsyLegM7vjnap7JDiXuuBlV3Vs70//Ye6EvrnZ2VmZl2RlZ+f2nTT/n7a/e6xeEmguBHRm98WQtHd+GZidmSJ//OWzC0YjjozRX1n71icSR2g19Gb3prR3djaCJSjZqd8/MWNCPyQ2cPKsdYcklpWW3uxGVEk7709BwAQiu6ZzG6b0zYAdWf2m7aiISAcqvBLQm90TLRIVeWMogiYA2TV99FQunBj9w1PSXvNKaM5u8HsS1bzF6GMnAppdeNeyoXDqhmf/IFGRIkt3dvMapU3VCnOPig1sdmr/PHd1XPfP55VI25lOmrPLeUtaqVN3IYjMzu7ol+CWZRVWiYhEHrWgOTvrS9KqeR2CyeTszq4ZYME96/qfNEpLkQXd2UUPofjdkkC9rAtGdnvHwaPMpb8rtKA9u3+Ty35yLYLK2Oxavns1vLtjDLRnN/6Pcknl100+nDig2b2/KAveLbl45sE+mrOzNoqInP3RXyDADM2uOBca3FsvIjsG6s1uaq2IvDUBgWZkds3/Ch3ml8slb4/UmV2fXSIfLctDsJmYXeVy6DCzWi47eqvG7J6SC88EZHtYsLKr+CJ0mBGSNrX3ZOjK7tbK14KyOyxY2X3wBeiw9GKHbQ6asutX9ADIwOxOT4EOs2ukvVCBnuxyAnCaUxCzuzgdOtzeLJ08bHXOzvTzhZmdbRUzoMPcJums8WFmx+xiq50FHe4rl64aC5gds4ul7iHocG+dxFI3l9kxu67Uv0OHWRcltgPDmB2z6+K93tBgbo3Es6cPs2N2nXw6GhosrJB4lJQwO2bXUdNSaLCoUhIIPczsmF0Hz0ODmWFJqGLqIGbH7K7YPwDezb8oSbw5kNkxu6jG6fBuTrkk9bflzI7ZtdkH7+5okuSqG5kds2vV+Hl4dn+T2MLsmF2rJzN0TLAzOwDMzrYDI+DV7EphdpcwO7vUM/BqVp0wu88wO7vOjIBHc+qE2V3G7OxaA4+W1gqza8XsbKrqB29mVwuza8Ps7FHPZsKTO5qF2UUxO3sio+DJnCZhdlcwO3sO5MGL+y4Is2uH2dnznUx4MLtRmF17zM6WijvhwawmYXYdMDtb3h8I9xZWCbPriNnZ8hLcm1shzK4TZmdH3RK4dm+NMLvOmJ0d5/rCrXlhYXZdMDs73oFbC6qF2XXF7GwIPw6X5pYLs4uB2dnQPBXu3N4kzC4WZmdDZR+4YS1pEWYXC7OzY5/rCXZmFxuzs2E73LirVphdHMzOhsfgwsyQMLt4mJ0NfwPnFlYLs4uL2dlwNxz7SrUwu/iYXXKVk9ycwc7sEmB2yZ0fD4dmNAizS4TZJXf2Jjgzr06YXULMLrmy6+CEtbhcmF1CzM6G/x0GJ2ZGhNklweyS2+cou3tahNklw+w0Z7eoSphdUsxOb3Yzq4TZJcfskts7FHYtqhdmZwOzS+7EGNvVtYher1iggGZ3YQLsWVCuf8caBTW7T8fb3pmo23+AgpqdzIAddzWIbuoFUGCzuw823B8S7dT3QIHNrtBCUovqRL+Wx0GBzW4zkppWJz5oXAIKbHa/QjIzmsUP9RNAgc3udDYSu7fat0MwKLDZNd6EhO6vF3/szgAFNrvwMiQys1588o+g4GanXkECc+rFL3eAgpudfIz4FlSIX0IcBAh0dlW3I57F5eKbl3uBApxdZB3imCM+WgQKcnayNwsxzQiJfyqGgwKd3ZlbEMvEs+KjnX1Agc5OHkUMww+LjyKrQQHP7u1cdDHupPjp9DhQwLNrHIrObqkUP6kdoKBnpx620NFNB8RX9dNAQc9ODmWhgzGHxF9HQcxOFqK9G4+Lv9RaELOT3/bBFdOOic/ODAYxOwl/A1GTTorfVoGYnYjsGoRWI46K3z64HsTsLvkyLht+Snz3NIjZfebIMFxyy2Hx3Xt5IGZ3WSkATD4nvgvfBmJ2raqvTc0dVtaBmF3Ua1kTjon/yj8HYnZR5V/bLf5TBdwwxuzaWd//Z0p891pvELOL2gTkvid+OzIExOzaqJJsAKOqxF/1U0HMro3a1MsCgAci4qfmr/LcWGYXpba05pCzXfy0lo8TzC5KlURzyN0t/ikbCmJ2rdSGDAttrnpV/PIOq2N2UWpzJtrpt0P8oOSNq0HMrs3WbHQw4Dfih13DQMyulSqGhY6u/63o95trQcyuVWR9FroYtVN0+/VYELNrU5yDGPK+p0SrkmtAzK5NKWLLzA+JPvVP5YCYXStVmol48mtEl5oHQcyujdrQy0IcFmbsV6LFBwtAzK6VUpsykEj/r9eKd7Wr+LqO2V2htmUgibEfildlk0HMLkptyrCQTP/v/0m8qNzETWLM7gqlSrJgx6QfiHs7pnLihNm1V9wL9uTMLhN39szM/XN7988iSRGHcbx2d/YPnLpcKporeOgqRmck53sQX4IGooGRmSbCTU/3dM/sHoKBgZgLF4qYmQkGgokaGOiaLRoo/ZTiIOzu6NzO7t4zNVXfz2v4MjVdv+rqALI7ZRQ2wkXtPvvpz3FZx5/d5qUJsjtDzSAs5YUPv4/L+LF7KYDszmr2wrKeeePLeFFfvXMrgOzOkLrNsLyNRw/GP5z8ERf78+SnD57f54UJsjuvbzbDZb34/v3vfvlN8T/9fvzt/bu3A8hunqrtjXAFu7defffjL74+PpHijHTy6zeff/Lea89tB4RAdnOkdhCubHDz8acOXr7z+ttv/e3NV+4cPP3ETZL7F9nN0b2tcG02/sEfuXPI7jw1VJKJ9clO/XAQkIf1yS52fDk4G+uTXcsKm491yU7jrYBsrEt2FaP5nKxFdoo1R9+ysh7ZHVJdXtYhO40HPE3kJf3spDH7dblZg+x4hs1P+tmN2K/LT+LZSTUrbIYSzy62XHuTo6SzU2w3WWFzlHR2fUV0eUo6u2qX7PKUbnZSy85JrhLO7oifumwlm53GW2SXrUSzU1+xX5exRLOLh1SXs0Sz69ivy1qK2Umc6szcpbLjBDtyy05xxH5d7hLMruNvXfaSy04NE7H8LZsdJ9iRX3Z9y09dCdLKTjUTsSIslR0n2JFhdlMu1SzEUtkxEUNu2fVDoitGOtnVvCNWjkSyU2x5mihIKtlNAgqSRnZqdvhjV5IUspO4g70wSWR3xKnOwiSQnTomYqV5cHacYEeG2Y34ykl5Vp4dZ05KtOLs1AQUaGF2TMSQX3aKY046lWmV2fWssKVaYXaq+cpJqVaXnWrewi7WguyYiCG37DThBHvB/ic7TrAjv+zEzknZVpNdxzNs2VaRncYBZVtBdhpxp1PpVpDdkP91xbNnp2lA8dzZacLTBM5lx0QMGWanhupgz47viGEuO06wI2SXnRreEYM9u5Z7TuDOTlWgOpiz02ib6uDOjpvEMJ8dEzHMZJSdpuzXwZ2d7vLeBNzZacJEDPbsptwQC3d2ativgzu7vuIsMezZcVcn7NmpY4WFOzu+wI4VZFczEYM7O9VEB3d2arlJDO7sVDMRgzs7tUzEYM9uyi4xFmXHCXacssbZqWK/DvbsxnxbB/bsugCYs+s7nmHhzk5D3kyEOTupYzYBe3ZHrLC4SHZMxHDK+mUnTrDDn11sqA727FomYnBnp4aJGOzZNXsBsGYnjVhgYc9uzC4x3NmpZiIGc3ZSy9ME7NndYyIGd3YabrDCwpudVLPCwp1d7DjBDnt2LSss3Nn1fKkT/uyGrLAwZ6fI7TrwZ3dIdXBnp2bA0wS82annxglcPjtuEsMpiWfHfh3c2Uk1v3VwZxdb9utgzk5xxFvYsGc3Yr8O9uzqPX7r4M1O7JzAn11/xE8d3Nmp2iI7XD07TrBjKf7s4iHVwZ5dx34dzNmpZ78O9uxixUQM5uwU2a+DP7uOv3VwZ6dml+zgzU58MxHXmx0rLJZgzE4tEzFcb3ZMxGC3H/juP5Zgy27ECgt3dqqIDtefHV85wUL+7BS5gx327PpJAB5Gdnz3H3b7gf06LODP7ohTnXBnp479OpizU1/xWwd7djUTMdizY4WFPTuNA+DOruYdMdizq/hfh4ecHSss5vizU8tEDO7suIMdjuyYiGGOOTvV7NfBkR0n2DHHmp3GOwEwZ9fxpU64s+vZr0NwZ6fhDr91cGfXMBHDjC87TQMwY8tOE54mMOPLThUTMcz4slPDRAwzxuymTMTgM8tOTaA6WO2HfshEDGY3wkeP3NgHnB578i/G6xKhAk7euwAAAABJRU5ErkJggg==" alt="">
+        </div>
+      </div>
+      <div class="meta-wrap">
+        <h2 id="artist-a">—</h2>
+        <div class="artist" id="title-a">Aucun morceau chargé</div>
+        <div class="contrib">Contribué par&nbsp;: <em id="contrib-a">—</em></div>
+      </div>
+    </div><!-- /.track-info -->
+
+    <div class="wave-col">
+      <div class="wave-header">
+        <div class="stat big"><em>BPM</em><span id="bpm-a">—</span></div>
+        <div class="stat center"><em>Clef</em> <span id="key-a">—</span></div>
+        <div class="stat right"><em>Gain</em> <span id="gain-a-disp">0 dB</span></div>
+      </div>
+      <div class="waveform" id="wave-a">
+        <div class="wave-bars" id="wave-bars-a"></div>
+        <div class="wave-playhead"></div>
+      </div>
+      <div class="wave-time">
+        <div class="left" id="time-a">0:00</div>
+        <div class="mid">position</div>
+        <div class="right" id="remain-a">-0:00</div>
+      </div>
+    </div>
+
+    <div class="transport-col">
+      <div class="transport">
+        <button class="btn big" data-action="play" data-deck="a" id="play-a"><span class="tri"></span> <span>Play</span></button>
+        <button class="btn big" data-action="cue" data-deck="a">Cue</button>
+        <button class="btn" data-action="sync" data-deck="a">Sync</button>
+        <button class="btn" data-action="load-next" data-deck="a">Charger →</button>
+      </div>
+      <div class="loop-grid">
+        <div class="loop-label">Boucle · en mesures</div>
+        <div class="loop-buttons" data-deck="a">
+          <button data-bars="0.25">¼</button>
+          <button data-bars="0.5">½</button>
+          <button data-bars="1">1</button>
+          <button data-bars="2">2</button>
+          <button data-bars="4">4</button>
+        </div>
+      </div>
+      <div class="pitch-row">
+        <div class="pitch">
+          <label>Pitch</label>
+          <div class="val"><span id="pitch-a">+0,0 %</span></div>
+          <input type="range" id="pitch-a-input" min="-8" max="8" step="0.1" value="0">
+        </div>
+        <div class="pitch">
+          <label>Gain</label>
+          <div class="val"><span id="gain-a">0 dB</span></div>
+          <input type="range" id="gain-a-input" min="-12" max="12" step="0.5" value="0">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MIXER -->
+  <section class="mixer" data-screen-label="Mixer center">
+
+    <div class="eq-col">
+      <div class="col-label">Égaliseur <em>3-bandes · par canal</em></div>
+      <div class="eq-stack">
+        <div class="knob-row"><div class="knob-label">HI · A</div><input type="range" class="ma-slider" id="hi-a" min="-24" max="12" step="0.5" value="0"><div class="value" id="hi-a-val">0</div></div>
+        <div class="knob-row"><div class="knob-label">MID · A</div><input type="range" class="ma-slider" id="mid-a" min="-24" max="12" step="0.5" value="0"><div class="value" id="mid-a-val">0</div></div>
+        <div class="knob-row"><div class="knob-label">LO · A</div><input type="range" class="ma-slider" id="lo-a" min="-24" max="12" step="0.5" value="0"><div class="value" id="lo-a-val">0</div></div>
+        <div style="height:1px;background:#000;margin:6px 0;"></div>
+        <div class="knob-row"><div class="knob-label">HI · B</div><input type="range" class="ma-slider" id="hi-b" min="-24" max="12" step="0.5" value="0"><div class="value" id="hi-b-val">0</div></div>
+        <div class="knob-row"><div class="knob-label">MID · B</div><input type="range" class="ma-slider" id="mid-b" min="-24" max="12" step="0.5" value="0"><div class="value" id="mid-b-val">0</div></div>
+        <div class="knob-row"><div class="knob-label">LO · B</div><input type="range" class="ma-slider" id="lo-b" min="-24" max="12" step="0.5" value="0"><div class="value" id="lo-b-val">0</div></div>
+      </div>
+    </div>
+
+    <div class="crossfader-col">
+      <div class="col-label">Crossfader <em>A ↔ B</em></div>
+
+      <div class="xfader-wrap">
+        <div class="xfader-track" id="xfader-track">
+          <div class="hair"></div>
+          <div class="xfader-thumb" id="xfader-thumb"></div>
+        </div>
+        <div class="xfader-ends">
+          <div class="left">A</div>
+          <div class="mid" id="xfader-readout">centre</div>
+          <div class="right">B</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mix-col">
+      <div class="col-label">Mélange <em>faders · par canal</em></div>
+
+      <div class="channel-faders">
+        <div class="channel">
+          <div class="c-label">A</div>
+          <div style="display:flex; justify-content:center; gap:8px;">
+            <div class="c-track" id="fader-a">
+              <div class="c-fill" style="height:75%;"></div>
+              <div class="c-thumb" style="bottom:75%;"></div>
+            </div>
+            <div class="c-meter" id="meter-a"></div>
+          </div>
+          <div class="c-row">
+            <span class="headphone" data-deck="a" id="cue-a">Casque</span>
+          </div>
+        </div>
+        <div class="channel">
+          <div class="c-label">B</div>
+          <div style="display:flex; justify-content:center; gap:8px;">
+            <div class="c-track" id="fader-b">
+              <div class="c-fill" style="height:75%;"></div>
+              <div class="c-thumb" style="bottom:75%;"></div>
+            </div>
+            <div class="c-meter" id="meter-b"></div>
+          </div>
+          <div class="c-row">
+            <span class="headphone" data-deck="b" id="cue-b">Casque</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- DECK B -->
+  <section class="deck" data-side="b" data-screen-label="Deck B">
+    <span class="corner tl">DECK&nbsp;B</span>
+    <span class="corner tr">Chargé depuis <em style="font-family: var(--ma-font-display); font-style: normal; color: #fff;" id="crate-b">Carton — avril 2026</em></span>
+
+    <div class="track-info">
+      <div class="artwork-wrap">
+        <div class="artwork idle" id="art-b">
+          <img class="logo-glitch no-invert" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnYAAAJ2CAAAAAD3P5AlAAAACXBIWXMAAAsTAAALEwEAmpwYAAAboElEQVR42uzd3W7cRBiH8f947N3w2dKUC0aq1JPG9trORxFwABKUQiuEEEIICckn3BR+B6UNbdJk02yVfTNOn981PJrx7jv2KAHO7GslwJfVO2QHb6vFR2QHX3Yg3SE7uLI2BrKDL6uLwGoHX7YfJbKDr4NSZAdfU6tAdvA17VUS2cFXtxDZwZcNCmQHX9aVEtnB194ikB182SpIZAdXdhRFdvBlbRHIDq7M+iiRHXytKpEdnNUKZAdf1lYS2cFXtxTZwZXZIJEdfE1NJDs4s7oKZAdXZkMhkR1c2VEU2cGXtUUgO7iyqS4lsoOv/UpkB2e9AtnBl61Kiezgq94R2cGVpTaI7ODLDqLIDr6srQLZwZVZX0pkB1fWR5EdfFkdAtnBldmqlMgOvoalyA6uLPUhkB18TXWUyA6+mqXIDq4sDYXIDr7ssBDZwZe1ZSA7uLKpKSWygys7iiI7OOtDIDu4MmujRHbw1eyI7ODKUlMEsoMv6wuJ7OCrXQaygyuzPkpkB1dTF0R28GVNJDu4OjnBTnbwdViK7OCsLwLZwde0V0hkB1+rpcgOriz1UWQHXzYEkR18WbMkO/gyq6NEdnBlj4PIDr6sj2QHX2ZtKZEdXNmqEtnBWVsEsoMvWwWJ7OBrtSOygytLfSmyg6+plcgOvqypAtnBlVlbidUOvuyoENnBlw0xkB3ekPUJdrLDOxkqkR2cDTGQHXxZJ4ns4MrqJdnBW12K7ODLDiSygy/rq0B28GVtFKsdfFlXiOzgbFUEsoMva4NEdnBl3UJkB2dDGcgOvqyWRHZwZfUikB2crSqx2uGsmU7EyA6XsKEMZAdf9iiK1Q6+7KAQ2cHZQQxkB1+2UhDZwZXVC4ns4KupAtnBl/UKIju4stUiiOzg60V1ZAdPttIxsoMj66KOkR38WBuDjpEd3Nh+1EtkBzcHpU6QHZzYnoJOkB18WFPpFbKDj26p18gOHmxQ0GtkBwdTV+o0ssP22aMq6DSyw9bZftBZZIdjM7pbh+xwBXbBXdhkh+2amlLnkB22qyt1HtlhqzoFnUd2WZqSpdtg3f2wZJelf75Pt8JqqQuRXZb+/vDHf9PcmTVag+yyNEr7s99mrY1ag+yyNErxMM2btYugNcguS6OkD56mGTMbCq1FdlkaJemT39N82VHUemSXpVHH7n83pZmyvSLoEmSXo1EvxAdplsxWpS5Ddlka9dLicZql/YUuRXZZGnVid5bPd72CLkd2ORr1v89+TXMztaXehuxyNOqVe12amb2l3orscjTqteXDOc0rzIagtyK7LI06pfwhzcfVvvxPdlkaddr9P9JcWFsFXQHZ5WjUGXeepFmwK59gJ7scjTpr0aQ5sCHqSsguS6PeUH45gzmZdSHoSsguS6PeVPycMrfJRIzssjTqnLvZ/288LHVlZJejUed9/lPO59wtNZvssGSXo1EXyXleYU3UBsguN+uzi/spW+2ONkB2WRp1oU+fpyxZGgptguyyNGpNd7+lHE2HhTZCdlkatcbutyk/tlcGbYbscjRqneqLlBmzrtSGyC5Lo9ZaHKZ3cMvfESO7bWen3T9TVvoQlCeyu8bsdPd5yoZNdaY7LNldc3a6s5ey0SyVLbK71uy0bKaUA8t4hyW7a89OxZOUA+sLZYzsriu7vN6fbZcZr3Vkd/3ZafeppZtllvGvCbLbTnaKtaUbZX3WSx3ZbSU7FV+lm2RdJLtbZtQVlM/Seu/tRIzstpydPv4l3ZjD/Ksju+1kp91nU7oZTZH7Dkt2W8tOoU43wepcp/9k55GdYpduQLejOSC7a8ouh/cYLfWzWOvIbmOj8u1uGmbwWEd2W85O975JnuzRguxuqVEbWDxIp71nX5wgO/fs/M+52+O5LHVkt+3sdO+v5MP67CdiZOeWne49Tyfe2xPsZOefnT55mLZvTs91ZOeRnRYO988Oc5iIkZ1Ddo7fXbT/2LvX6KrKO4/jv50LwUC4KoiFARciIjeHsahQRSl3ULC1RTtT11C0NIGQOjrj0hmdGdo6VOSSEBjsBde0Za1ZupTazjhqKyzK4Ap1OnUpVO5gAamQe0JOLuc8/y4kOeRyLvvy7JOcZ/8+75O8+a69s/fzf55d3KMn2JldSrNL2fd6itNjRYzZpTY7XOPj9U5Jej1NMLuUZYdM//YxqmKkH2aXkuxgvejbBHvarIgxu5Rnh947xQdKbUq/OyyzS1126Puq6Ke2pdszLLNLbXYY+KoSzVRaTLAzu+7MDpkvKN0T7Ol5rWN2qcwOWetFq9JeSFPMLoXZYcAbWqtLp5kTZtd92WHQL0WXSDq+r2N23ZIdBm3VdgZ72t5hmV3Ks0PO90WLNJt0Ynbdmx2yfyjeqa1Ia8wu1dlh0NsaJtiz0/Zpgtl1T3YY/PNgnDjB7HpUdsj9rsnnEjO7HpodsrcpcU1tSdMVMWbXzdkh0/19Vm1K++iYnf/Z6f7+bEk6v69jdt2bHQa77G5jmj/DMrtuzQ5ZJWE3k04wArPrruyALS72TfTsr5wwuzTILvd1cag4G2Zgdt2XHfo7mzeOpPmKGLPrGdlhwCuO3pyk73wds+tJ2SFrgwrOihiz6ynZIft52zMnBlXH7Lo5O/R/U2zZas4dltmlIDst35+NbIJJ1TG7bs8OA9cnr26DKW9OmF1PyQ45SbtL96lOZtcDs0P2T5PM15l1h2V2PSM7DHoj4YpYOp7pxOx6fna4+nWJa4N51TG7npEdrnouIjGpEhiI2fWM7JCxLQBviZldT8sOWf9l+Doss+uJ2SHv5Ri7dYy81jG7HpQd+u8068QJZpcW2SFrS7jjzIlx7+uYnYbs9NsoVyhjZomZXQ/Prs8vJKokB8Zidm6zs+CHwa+buyLG7DRkN3R6Nnww8GdySZp9H5bZpSq7iYdXww9ZG0VEmbELm9lpz+7GQ02FsKBfzguithgdHbPzkN1HEsqHHwb86geGviVmdjqyk4aH4Iep/WA4ZuclO6laBQu63frxLqOfJ5id1+zk4reh24iTIvNgNmbnLTsJFUCvm4+LyH4+UlCi7CS0zIJG4w+KiNTdCaMxO6/ZSWg+9Jn0oXxmM4zG7DxnJw0FsKDHhEq57MRYmIzZec9OGpdb0GLUMWkzFyZjdhqyk9AK6DCx3a9cZ/D8CbPTk5005sOCV6Pa/8YLw2EwZqclO6maD69uOCXtPQCDMTs92amGfHgzuU46eDftv/DE7HzPTiTkbZ1s7EHpKDQB5mJ2urKThiK4N/KIdBJZA3MxO23ZSWg53Bp3PNZfMhez05ednH/IsuDG9GPS1ZnPw1jMTmN2buc+J5yQWJ6BsZidzuykaSUsOHXDYYnpF31gKmanNTtpfMSCQ8NPSGzHx8FUzE5vdtLwAJyZdFjiuQ+mYnaas5NqZ+/vppyRuMzdycPsdGcnDath35CPJb6DJnwom9n5nl10/s6ucSclgao8GIrZ6c9OQt+EBTtuPiiJNN8MQzE7H7KT+rmwY9wfJKHIChiK2fmRnapfieQm10gS78BQzE5rdk7m3McelmTOm7pvkdlpzc7BnPv4A5JU7SSYidn5lJ00fQux2Pvx6JoHzMTs/MpOGr6VgbjGnhQb1EswE7PTnp2d3V8Tq8WWMpiJ2fmYXWQrYrvxoNhzZCiMxOx8zE7C2xHLkBNi07m/hJGYnZ/ZSfhf0NVNJ8WuusUwErPzNTup/w46+8JxsS1SACMxO3+zE9mGjsYcEweeM3O3LLPzO7tIaS+0M/aoOPFjM2efmJ3f2YmszULUDUfFkf82c/aJ2fmfnRSgzaSD4kzZIJiI2aUgu1AxLrv1jDh0ehhMxOxSkJ2oUlwy5JQ4dWEETMTsPGTnwAs5wI0nxDH1VzARs0tNdpF1mHRQnFNmjj4xu9RkJxenlIkDhp9hzOxSlF0xFleKC48a+b6Y2aUkO7UpE1gpLnyD2ZHb7Ep6A0Ahs2N2KctOyeZMfGYrs2N2qcoushGtri4Tp5YzO3KTndrYy4r+0BFx6O+NPH6H2fmcnVIlWbji7jpx5hFe7chFdi9aaO8x/m/H7HzPTm3OtNBe71eYHbPzNzsVWZ+JTkZ+yOyYnb/Zbc1CFwUt4sA3mR05zK40w0IXvfeIA/NgImbnX3aqOAOxTGwR29QtMBGz8y07taE3YspYI/aZuT+b2fmUnZKNmYgjb6/YdZ7TxeQkuy2Ib0Gz2PTxtTARs/MnO1XSy0JcA/fY/nMDYSJm50d2ShVnIZFHmsWeV3NhImbnR3aREgsJXfWJ2FOaDRMxOx+ya3kuw0Jiz4fFlr+DkZid9uxUc5GFZAbUih0NX4WRmJ327MIrLST3kthx/jYYidlpz24l7JgmdhwZAiMxO83ZhVbClkHviogE9TM8zE5vds2rLdjzbUku/DzMxOx0ZqekEHbNrJSkLi6EmZidzuya82HbgDJJqqIPzMTsNGbXssqCfdvs/DFDMTtt2alIoQUHHqyTJNRyGIrZacsussKCE9edkSRC18FQzE5XdqrAgjO/lyRO58BQzE5PdqqpyIJD2yWJ/8yCoZidnuyaV1pwqkiS+BpMxex0ZKck34JjMyWxQ2NgKmanI7vGQrgwWRL7sZFbZJmdhuyiK2IujJaEapbAWMzOc3ZK3FWHa8OSyP9fBWMxO8/ZtayAO0PqJYHIEzAXs/OaXbjAgjt9P5AEzhp8sWN2HrNT4SILLuV9KAk8DoMxO0/ZqXC+BbfyDkh8lSNhMGbnKTvJt+BPdk8beWYxs9OQnWpaBfiT3QUzvzXG7DRk11xo+ZXdjyyYjNm5zW7MR9I21an/SbbGzO95MjvP2Y0/+hi8GXha4imF2Zid2+xGfjkH3gxTEse5/jAbs3Ob3YRcePS5iMTWdA8Mx+xcZnf3rwfBo5sljlJjxzuZnbfs7mzanQePbpPYjo+F6Zidq+wW1cju/vBoscQUXgPjMTs32c2vFA3ZPSUx/Z/xt1hm5yq7OU2iI7v/kVg+GQzzMTvn2c2vFx3Z9TomMTSY+dkdZufNHiwoFy3ZTfxUugo/afaqGLNzZ+/0StGT3aMN0tXLvRAEzM4R1Vx0VjRl96J0dXAAAoHZOdKUn9moKbuh70sXFaMRDMzOCVVkXdOgKbt7KqSzc3cjIJidfSpSYEFbdk9LZ41LERTMzr7ICgvassv7eYyjQAOD2dnWUmhBX3Zj66Sj2r+2AvHuhNk5oZpXWdCY3ZPSUSg4d9iAZqdUzZ/273t57bp169bu3Fd2rkbsyLegM7vjnap7JDiXuuBlV3Vs70//Ye6EvrnZ2VmZl2RlZ+f2nTT/n7a/e6xeEmguBHRm98WQtHd+GZidmSJ//OWzC0YjjozRX1n71icSR2g19Gb3prR3djaCJSjZqd8/MWNCPyQ2cPKsdYcklpWW3uxGVEk7709BwAQiu6ZzG6b0zYAdWf2m7aiISAcqvBLQm90TLRIVeWMogiYA2TV99FQunBj9w1PSXvNKaM5u8HsS1bzF6GMnAppdeNeyoXDqhmf/IFGRIkt3dvMapU3VCnOPig1sdmr/PHd1XPfP55VI25lOmrPLeUtaqVN3IYjMzu7ol+CWZRVWiYhEHrWgOTvrS9KqeR2CyeTszq4ZYME96/qfNEpLkQXd2UUPofjdkkC9rAtGdnvHwaPMpb8rtKA9u3+Ty35yLYLK2Oxavns1vLtjDLRnN/6Pcknl100+nDig2b2/KAveLbl45sE+mrOzNoqInP3RXyDADM2uOBca3FsvIjsG6s1uaq2IvDUBgWZkds3/Ch3ml8slb4/UmV2fXSIfLctDsJmYXeVy6DCzWi47eqvG7J6SC88EZHtYsLKr+CJ0mBGSNrX3ZOjK7tbK14KyOyxY2X3wBeiw9GKHbQ6asutX9ADIwOxOT4EOs2ukvVCBnuxyAnCaUxCzuzgdOtzeLJ08bHXOzvTzhZmdbRUzoMPcJums8WFmx+xiq50FHe4rl64aC5gds4ul7iHocG+dxFI3l9kxu67Uv0OHWRcltgPDmB2z6+K93tBgbo3Es6cPs2N2nXw6GhosrJB4lJQwO2bXUdNSaLCoUhIIPczsmF0Hz0ODmWFJqGLqIGbH7K7YPwDezb8oSbw5kNkxu6jG6fBuTrkk9bflzI7ZtdkH7+5okuSqG5kds2vV+Hl4dn+T2MLsmF2rJzN0TLAzOwDMzrYDI+DV7EphdpcwO7vUM/BqVp0wu88wO7vOjIBHc+qE2V3G7OxaA4+W1gqza8XsbKrqB29mVwuza8Ps7FHPZsKTO5qF2UUxO3sio+DJnCZhdlcwO3sO5MGL+y4Is2uH2dnznUx4MLtRmF17zM6WijvhwawmYXYdMDtb3h8I9xZWCbPriNnZ8hLcm1shzK4TZmdH3RK4dm+NMLvOmJ0d5/rCrXlhYXZdMDs73oFbC6qF2XXF7GwIPw6X5pYLs4uB2dnQPBXu3N4kzC4WZmdDZR+4YS1pEWYXC7OzY5/rCXZmFxuzs2E73LirVphdHMzOhsfgwsyQMLt4mJ0NfwPnFlYLs4uL2dlwNxz7SrUwu/iYXXKVk9ycwc7sEmB2yZ0fD4dmNAizS4TZJXf2Jjgzr06YXULMLrmy6+CEtbhcmF1CzM6G/x0GJ2ZGhNklweyS2+cou3tahNklw+w0Z7eoSphdUsxOb3Yzq4TZJcfskts7FHYtqhdmZwOzS+7EGNvVtYher1iggGZ3YQLsWVCuf8caBTW7T8fb3pmo23+AgpqdzIAddzWIbuoFUGCzuw823B8S7dT3QIHNrtBCUovqRL+Wx0GBzW4zkppWJz5oXAIKbHa/QjIzmsUP9RNAgc3udDYSu7fat0MwKLDZNd6EhO6vF3/szgAFNrvwMiQys1588o+g4GanXkECc+rFL3eAgpudfIz4FlSIX0IcBAh0dlW3I57F5eKbl3uBApxdZB3imCM+WgQKcnayNwsxzQiJfyqGgwKd3ZlbEMvEs+KjnX1Agc5OHkUMww+LjyKrQQHP7u1cdDHupPjp9DhQwLNrHIrObqkUP6kdoKBnpx620NFNB8RX9dNAQc9ODmWhgzGHxF9HQcxOFqK9G4+Lv9RaELOT3/bBFdOOic/ODAYxOwl/A1GTTorfVoGYnYjsGoRWI46K3z64HsTsLvkyLht+Snz3NIjZfebIMFxyy2Hx3Xt5IGZ3WSkATD4nvgvfBmJ2raqvTc0dVtaBmF3Ua1kTjon/yj8HYnZR5V/bLf5TBdwwxuzaWd//Z0p891pvELOL2gTkvid+OzIExOzaqJJsAKOqxF/1U0HMro3a1MsCgAci4qfmr/LcWGYXpba05pCzXfy0lo8TzC5KlURzyN0t/ikbCmJ2rdSGDAttrnpV/PIOq2N2UWpzJtrpt0P8oOSNq0HMrs3WbHQw4Dfih13DQMyulSqGhY6u/63o95trQcyuVWR9FroYtVN0+/VYELNrU5yDGPK+p0SrkmtAzK5NKWLLzA+JPvVP5YCYXStVmol48mtEl5oHQcyujdrQy0IcFmbsV6LFBwtAzK6VUpsykEj/r9eKd7Wr+LqO2V2htmUgibEfildlk0HMLkptyrCQTP/v/0m8qNzETWLM7gqlSrJgx6QfiHs7pnLihNm1V9wL9uTMLhN39szM/XN7988iSRGHcbx2d/YPnLpcKporeOgqRmck53sQX4IGooGRmSbCTU/3dM/sHoKBgZgLF4qYmQkGgokaGOiaLRoo/ZTiIOzu6NzO7t4zNVXfz2v4MjVdv+rqALI7ZRQ2wkXtPvvpz3FZx5/d5qUJsjtDzSAs5YUPv4/L+LF7KYDszmr2wrKeeePLeFFfvXMrgOzOkLrNsLyNRw/GP5z8ERf78+SnD57f54UJsjuvbzbDZb34/v3vfvlN8T/9fvzt/bu3A8hunqrtjXAFu7defffjL74+PpHijHTy6zeff/Lea89tB4RAdnOkdhCubHDz8acOXr7z+ttv/e3NV+4cPP3ETZL7F9nN0b2tcG02/sEfuXPI7jw1VJKJ9clO/XAQkIf1yS52fDk4G+uTXcsKm491yU7jrYBsrEt2FaP5nKxFdoo1R9+ysh7ZHVJdXtYhO40HPE3kJf3spDH7dblZg+x4hs1P+tmN2K/LT+LZSTUrbIYSzy62XHuTo6SzU2w3WWFzlHR2fUV0eUo6u2qX7PKUbnZSy85JrhLO7oifumwlm53GW2SXrUSzU1+xX5exRLOLh1SXs0Sz69ivy1qK2Umc6szcpbLjBDtyy05xxH5d7hLMruNvXfaSy04NE7H8LZsdJ9iRX3Z9y09dCdLKTjUTsSIslR0n2JFhdlMu1SzEUtkxEUNu2fVDoitGOtnVvCNWjkSyU2x5mihIKtlNAgqSRnZqdvhjV5IUspO4g70wSWR3xKnOwiSQnTomYqV5cHacYEeG2Y34ykl5Vp4dZ05KtOLs1AQUaGF2TMSQX3aKY046lWmV2fWssKVaYXaq+cpJqVaXnWrewi7WguyYiCG37DThBHvB/ic7TrAjv+zEzknZVpNdxzNs2VaRncYBZVtBdhpxp1PpVpDdkP91xbNnp2lA8dzZacLTBM5lx0QMGWanhupgz47viGEuO06wI2SXnRreEYM9u5Z7TuDOTlWgOpiz02ib6uDOjpvEMJ8dEzHMZJSdpuzXwZ2d7vLeBNzZacJEDPbsptwQC3d2ativgzu7vuIsMezZcVcn7NmpY4WFOzu+wI4VZFczEYM7O9VEB3d2arlJDO7sVDMRgzs7tUzEYM9uyi4xFmXHCXacssbZqWK/DvbsxnxbB/bsugCYs+s7nmHhzk5D3kyEOTupYzYBe3ZHrLC4SHZMxHDK+mUnTrDDn11sqA727FomYnBnp4aJGOzZNXsBsGYnjVhgYc9uzC4x3NmpZiIGc3ZSy9ME7NndYyIGd3YabrDCwpudVLPCwp1d7DjBDnt2LSss3Nn1fKkT/uyGrLAwZ6fI7TrwZ3dIdXBnp2bA0wS82annxglcPjtuEsMpiWfHfh3c2Uk1v3VwZxdb9utgzk5xxFvYsGc3Yr8O9uzqPX7r4M1O7JzAn11/xE8d3Nmp2iI7XD07TrBjKf7s4iHVwZ5dx34dzNmpZ78O9uxixUQM5uwU2a+DP7uOv3VwZ6dml+zgzU58MxHXmx0rLJZgzE4tEzFcb3ZMxGC3H/juP5Zgy27ECgt3dqqIDtefHV85wUL+7BS5gx327PpJAB5Gdnz3H3b7gf06LODP7ohTnXBnp479OpizU1/xWwd7djUTMdizY4WFPTuNA+DOruYdMdizq/hfh4ecHSss5vizU8tEDO7suIMdjuyYiGGOOTvV7NfBkR0n2DHHmp3GOwEwZ9fxpU64s+vZr0NwZ6fhDr91cGfXMBHDjC87TQMwY8tOE54mMOPLThUTMcz4slPDRAwzxuymTMTgM8tOTaA6WO2HfshEDGY3wkeP3NgHnB578i/G6xKhAk7euwAAAABJRU5ErkJggg==" alt="">
+        </div>
+      </div>
+      <div class="meta-wrap">
+        <h2 id="artist-b">—</h2>
+        <div class="artist" id="title-b">Aucun morceau chargé</div>
+        <div class="contrib">Contribué par&nbsp;: <em id="contrib-b">—</em></div>
+      </div>
+    </div><!-- /.track-info -->
+
+    <div class="wave-col">
+      <div class="wave-header">
+        <div class="stat big"><em>BPM</em><span id="bpm-b">—</span></div>
+        <div class="stat center"><em>Clef</em> <span id="key-b">—</span></div>
+        <div class="stat right"><em>Gain</em> <span id="gain-b-disp">0 dB</span></div>
+      </div>
+      <div class="waveform" id="wave-b">
+        <div class="wave-bars" id="wave-bars-b"></div>
+        <div class="wave-playhead"></div>
+      </div>
+      <div class="wave-time">
+        <div class="left" id="time-b">0:00</div>
+        <div class="mid">position</div>
+        <div class="right" id="remain-b">-0:00</div>
+      </div>
+    </div>
+
+    <div class="transport-col">
+      <div class="transport">
+        <button class="btn big" data-action="play" data-deck="b" id="play-b"><span class="tri"></span> <span>Play</span></button>
+        <button class="btn big" data-action="cue" data-deck="b">Cue</button>
+        <button class="btn" data-action="sync" data-deck="b">Sync</button>
+        <button class="btn" data-action="load-next" data-deck="b">Charger →</button>
+      </div>
+      <div class="loop-grid">
+        <div class="loop-label">Boucle · en mesures</div>
+        <div class="loop-buttons" data-deck="b">
+          <button data-bars="0.25">¼</button>
+          <button data-bars="0.5">½</button>
+          <button data-bars="1">1</button>
+          <button data-bars="2">2</button>
+          <button data-bars="4">4</button>
+        </div>
+      </div>
+      <div class="pitch-row">
+        <div class="pitch">
+          <label>Pitch</label>
+          <div class="val"><span id="pitch-b">+0,0 %</span></div>
+          <input type="range" id="pitch-b-input" min="-8" max="8" step="0.1" value="0">
+        </div>
+        <div class="pitch">
+          <label>Gain</label>
+          <div class="val"><span id="gain-b">0 dB</span></div>
+          <input type="range" id="gain-b-input" min="-12" max="12" step="0.5" value="0">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section class="library" id="library" data-screen-label="Library">
+    <div class="library-head">
+      <h3>Bibliothèque</h3>
+      <div class="crates">
+        <a href="#" class="on" data-mood="*">Tous les morceaux</a>
+      </div>
+      <input class="search" id="library-search" placeholder="Chercher un⋅e artiste, un morceau…" type="search">
+    </div>
+    <table class="library-table">
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th style="width:22%;">Artiste</th>
+          <th>Morceau</th>
+          <th style="width:80px;">BPM</th>
+          <th style="width:70px;">Clef</th>
+          <th style="width:70px;">Durée</th>
+          <th>
+            <select id="contrib-filter" style="font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;background:transparent;border:0;border-bottom:1px dotted #000;color:inherit;cursor:pointer;padding:2px 0;">
+              <option value="">Contribué par ▾</option>
+            </select>
+          </th>
+          <th class="loadcell">Charger</th>
+        </tr>
+      </thead>
+      <tbody id="library-body"><tr data-idx="0" class="loaded-a">
+      <td class="num">01</td>
+      <td class="artist">Les Calanques Électroniques</td>
+      <td class="title">Pastis au casque <span style="color:var(--ma-gray-dark);font-style:normal;">· house moite</span></td>
+      <td class="num">124</td>
+      <td>5A</td>
+      <td class="num">5:12</td>
+      <td class="contrib">camille⋅l</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="0"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="0"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="1">
+      <td class="num">02</td>
+      <td class="artist">Brouillard Kraut</td>
+      <td class="title">Navette pour Düsseldorf <span style="color:var(--ma-gray-dark);font-style:normal;">· motorik</span></td>
+      <td class="num">132</td>
+      <td>7A</td>
+      <td class="num">6:48</td>
+      <td class="contrib">vincent⋅le⋅motoriste</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="1"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="1"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="2" class="loaded-b">
+      <td class="num">03</td>
+      <td class="artist">Véro &amp; Les Velours</td>
+      <td class="title">Slow de fin de soirée, 1977 <span style="color:var(--ma-gray-dark);font-style:normal;">· yé-yé fané</span></td>
+      <td class="num">78</td>
+      <td>2B</td>
+      <td class="num">3:58</td>
+      <td class="contrib">mamie⋅rose</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="2"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="2"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="3">
+      <td class="num">04</td>
+      <td class="artist">Exutoire.exe</td>
+      <td class="title">Rave à la bourre <span style="color:var(--ma-gray-dark);font-style:normal;">· acid anarchique</span></td>
+      <td class="num">140</td>
+      <td>11A</td>
+      <td class="num">7:02</td>
+      <td class="contrib">DJ⋅bugatti⋅84</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="3"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="3"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="4">
+      <td class="num">05</td>
+      <td class="artist">Pierre Henry du Futur</td>
+      <td class="title">Messe pour une canette <span style="color:var(--ma-gray-dark);font-style:normal;">· musique concrète</span></td>
+      <td class="num">100</td>
+      <td>8B</td>
+      <td class="num">4:21</td>
+      <td class="contrib">chacun⋅e</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="4"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="4"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="5">
+      <td class="num">06</td>
+      <td class="artist">Les Sœurs Sardine</td>
+      <td class="title">Karaoké à l'huile <span style="color:var(--ma-gray-dark);font-style:normal;">· chanson salée</span></td>
+      <td class="num">92</td>
+      <td>3A</td>
+      <td class="num">2:44</td>
+      <td class="contrib">jeanne⋅b</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="5"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="5"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="6">
+      <td class="num">07</td>
+      <td class="artist">Turbo Biquet</td>
+      <td class="title">Techno de la ferme <span style="color:var(--ma-gray-dark);font-style:normal;">· acid rural</span></td>
+      <td class="num">138</td>
+      <td>6A</td>
+      <td class="num">5:36</td>
+      <td class="contrib">gérard⋅tracteur</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="6"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="6"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="7">
+      <td class="num">08</td>
+      <td class="artist">Thé Froid</td>
+      <td class="title">Été 96, sur la nationale <span style="color:var(--ma-gray-dark);font-style:normal;">· french touch</span></td>
+      <td class="num">110</td>
+      <td>4B</td>
+      <td class="num">4:48</td>
+      <td class="contrib">anon⋅yme</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="7"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="7"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="8">
+      <td class="num">09</td>
+      <td class="artist">Mélomane Fêlé⋅e</td>
+      <td class="title">Le disque rayé qu'on adore <span style="color:var(--ma-gray-dark);font-style:normal;">· DIY</span></td>
+      <td class="num">118</td>
+      <td>9A</td>
+      <td class="num">3:32</td>
+      <td class="contrib">collectif</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="8"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="8"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="9">
+      <td class="num">10</td>
+      <td class="artist">Constructions Incongrues</td>
+      <td class="title">Hymne des pastisseurs <span style="color:var(--ma-gray-dark);font-style:normal;">· anthemic</span></td>
+      <td class="num">126</td>
+      <td>10A</td>
+      <td class="num">6:04</td>
+      <td class="contrib">la⋅maison</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="9"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="9"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="10">
+      <td class="num">11</td>
+      <td class="artist">Radio Approximative</td>
+      <td class="title">Indicatif 03h17 <span style="color:var(--ma-gray-dark);font-style:normal;">· jingle</span></td>
+      <td class="num">85</td>
+      <td>1A</td>
+      <td class="num">1:52</td>
+      <td class="contrib">la⋅maison</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="10"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="10"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="11">
+      <td class="num">12</td>
+      <td class="artist">Biscotte Industrielle</td>
+      <td class="title">La chaîne du matin <span style="color:var(--ma-gray-dark);font-style:normal;">· gabber doux</span></td>
+      <td class="num">160</td>
+      <td>12A</td>
+      <td class="num">3:20</td>
+      <td class="contrib">paul⋅t</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="11"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="11"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="12">
+      <td class="num">13</td>
+      <td class="artist">Ondes Pantagruéliques</td>
+      <td class="title">Copeaux de sax, 2h14 <span style="color:var(--ma-gray-dark);font-style:normal;">· free jazz</span></td>
+      <td class="num">102</td>
+      <td>5B</td>
+      <td class="num">8:12</td>
+      <td class="contrib">le⋅baron</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="12"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="12"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="13">
+      <td class="num">14</td>
+      <td class="artist">Kraftwerk du Dimanche</td>
+      <td class="title">Auto-école mélodique <span style="color:var(--ma-gray-dark);font-style:normal;">· electro</span></td>
+      <td class="num">128</td>
+      <td>7B</td>
+      <td class="num">5:00</td>
+      <td class="contrib">karl⋅g</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="13"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="13"><span>→ B</span></button>
+      </td>
+    </tr><tr data-idx="14">
+      <td class="num">15</td>
+      <td class="artist">Le Comité d'Écoute</td>
+      <td class="title">Lettre au voisin du dessus <span style="color:var(--ma-gray-dark);font-style:normal;">· spoken word</span></td>
+      <td class="num">70</td>
+      <td>2A</td>
+      <td class="num">4:02</td>
+      <td class="contrib">le⋅comité</td>
+      <td class="loadcell">
+        <button class="load-btn" data-load="a" data-idx="14"><span>→ A</span></button>
+        <button class="load-btn" data-load="b" data-idx="14"><span>→ B</span></button>
+      </td>
+    </tr></tbody>
+    </table>
+    <div class="lib-footer">
+      <span id="lib-count">15 morceaux dans le carton</span>
+      <span>Double-clic · A&nbsp;/&nbsp;B pour charger · <kbd style="font-family:var(--ma-font-mono);background:#000;color:#fff;padding:1px 6px;">espace</kbd> play/pause</span>
+    </div>
+  </section>
+
+</div><!-- /.booth -->
+</main>
+
+<footer class="site-foot">
+  <div>
+    <h4>À propos</h4>
+    <p>Cette table de mixage est un exutoire d'exutoire&nbsp;: on a donné à la bande de mélomanes fêlé⋅e⋅s deux platines, six potards d'égaliseur, un crossfader et un bouton rouge&nbsp;— on les laisse s'amuser avec la playlist infernale.</p>
+  </div>
+  <div>
+    <h4>Raccourcis</h4>
+    <p>
+      <kbd>A</kbd>&nbsp;/&nbsp;<kbd>L</kbd>&nbsp;— play deck A&nbsp;/&nbsp;B<br>
+      <kbd>←</kbd>&nbsp;/&nbsp;<kbd>→</kbd>&nbsp;— crossfader<br>
+      <kbd>R</kbd>&nbsp;— enregistrer la session<br>
+      <kbd>Espace</kbd>&nbsp;— tout mettre en pause
+    </p>
+  </div>
+  <div>
+    <h4>Crédits</h4>
+    <p>Moteur audio&nbsp;: WebAudio, pas jPlayer pour une fois.<br>
+    Logo, comme toujours, par <a href="#">Iris Veverka</a>.<br>
+    Les morceaux listés sont fictifs — toute ressemblance avec la playlist du jour est volontaire.</p>
+  </div>
+</footer>
+
+<!-- Tweaks panel -->
+<div id="tweaks" class="">
+  <header><h5>Tweaks</h5><span style="font-family: var(--ma-font-display); font-size:10px; color: var(--ma-gray-dark);">v.0</span></header>
+  <div class="tweak-row">
+    <span>Inverser le rig</span>
+    <div class="sw" id="tw-invert"></div>
+  </div>
+  <div class="tweak-row">
+    <span>Afficher la bibliothèque</span>
+    <div class="sw on" id="tw-library"></div>
+  </div>
+  <div class="tweak-row" style="flex-direction: column; align-items: stretch; gap: 6px;">
+    <span>Nom de session</span>
+    <input id="tw-session" type="text" value="nuit du 19.04" style="border:1px solid #000; padding: 4px 6px; background: #fff; color: #000; font-family: var(--ma-font-body); font-size: 12px;">
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+var TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "invertRig": false,
+  "showLibrary": true,
+  "sessionName": "nuit du 19.04"
+}/*EDITMODE-END*/;
+</script>
+<script type="module" src="src/main.js"></script>
+
+
+
+
+</body></html>
