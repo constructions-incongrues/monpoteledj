@@ -229,15 +229,21 @@ export function renderGlitch(deckId, track) {
 
 export async function analyzeTrack(deckId, trackIdx, url) {
   if (!url) return;
+  console.log('analyzeTrack started:', { deckId, trackIdx, url });
   let decoded;
   try {
     const res = await fetch(url);
     const buf = await res.arrayBuffer();
     decoded = await ac.decodeAudioData(buf);
-  } catch(e) { console.warn('analyzeTrack decode failed:', e); return; }
+    console.log('analyzeTrack decoded:', { length: decoded.length, sampleRate: decoded.sampleRate, channels: decoded.numberOfChannels });
+  } catch(e) { 
+    console.warn('analyzeTrack decode failed:', e); 
+    return; 
+  }
 
-  const bpm = detectBpm(decoded);
+  const bpm = await Promise.resolve(detectBpm(decoded));
   const key = detectKey(decoded);
+  console.log('analyzeTrack analysis done:', { bpm, key });
 
   // Extract RMS amplitude per bar for real waveform
   const ch = decoded.getChannelData(0);

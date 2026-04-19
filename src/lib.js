@@ -38,8 +38,68 @@ export function mapPost(p) {
 }
 
 export function detectBpm(audioBuffer) {
-  try { return Math.round(new globalThis.MusicTempo(audioBuffer).tempo); }
-  catch(e) { return null; }
+  try {
+    // Check multiple sources: window.MusicTempo (direct), globalThis.MusicTempo (module scope)
+    const MusicTempo = window?.MusicTempo || globalThis.MusicTempo;
+    
+    if (!MusicTempo) {
+      console.warn('[lib.detectBpm] MusicTempo not loaded yet. Waiting...', {
+        hasWindow: !!window,
+        windowHasMusicTempo: !!window?.MusicTempo,
+        globalHasMusicTempo: !!globalThis.MusicTempo,
+        loadFlags: { mt: window?.MUSIC_TEMPO_LOADED, meyda: window?.MEYDA_LOADED }
+      });
+      // Retry logic: attendre que le CDN se charge
+      return new Promise((resolve) => {
+        const maxRetries = 50; // 5 secondes
+        let retries = 0;
+        const check = setInterval(() => {
+          retries++;
+          const MT = window?.MusicTempo || globalThis.MusicTempo;
+          if (MT) {
+            clearInterval(check);
+            try {
+              const chData = audioBuffer.getChannelData(0);
+              const tempo = new MT(chData).tempo;
+              const bpm = Math.round(tempo);
+              console.log('[lib.detectBpm] ✅ Success (delayed):', { bpm, tempo, bufferLength: audioBuffer.length, retries });
+              resolve(bpm);
+            } catch (e) {
+              console.error('[lib.detectBpm] ❌ Failed after library loaded:', e.message);
+              resolve(null);
+            }
+          } else if (retries >= maxRetries) {
+            clearInterval(check);
+            console.error('[lib.detectBpm] ❌ Timeout: MusicTempo never loaded after 5s', {
+              windowMusicTempo: window?.MusicTempo,
+              globalMusicTempo: globalThis.MusicTempo,
+              loadFlags: { mt: window?.MUSIC_TEMPO_LOADED, meyda: window?.MEYDA_LOADED }
+            });
+            resolve(null);
+          }
+        }, 100);
+      });
+    }
+    if (!audioBuffer || audioBuffer.length === 0) {
+      console.warn('[lib.detectBpm] Invalid audioBuffer', { length: audioBuffer?.length });
+      return null;
+    }
+    console.log('[lib.detectBpm] Calling MusicTempo with:', { 
+      MusicTempoType: typeof MusicTempo,
+      audioBufferType: audioBuffer.constructor.name,
+      audioBufferLength: audioBuffer.length,
+      audioBufferSampleRate: audioBuffer.sampleRate
+    });
+    // MusicTempo expects raw audio samples (array), not AudioBuffer
+    const channelData = audioBuffer.getChannelData(0);
+    const tempo = new MusicTempo(channelData).tempo;
+    const bpm = Math.round(tempo);
+    console.log('[lib.detectBpm] ✅ Success (immediate):', { bpm, tempo, bufferLength: audioBuffer.length });
+    return bpm;
+  } catch(e) {
+    console.error('[lib.detectBpm] ❌ Exception:', { error: e, message: e?.message, toString: String(e) }, { bufferLength: audioBuffer?.length });
+    return null;
+  }
 }
 
 export function detectKey(audioBuffer) {
