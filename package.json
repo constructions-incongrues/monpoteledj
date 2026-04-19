@@ -6,7 +6,7 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "vitest": "^2.0.0"
+    "vitest": "^4.1.4"
   },
   "dependencies": {
     "music-tempo": "^1.0.3"
