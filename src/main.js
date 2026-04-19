@@ -2,6 +2,7 @@ import { deckA, deckB } from './audio.js';
 import { fetchLibrary, LIBRARY, renderLibrary, populateContribFilter } from './library.js';
 import { applyCrossfader, adjustXfader, wireXfader, wireChannelFader, wireEq, wirePitch,
          loadTrack, togglePlay, sync, animate } from './mixer.js';
+import { initMidi } from './midi.js';
 
 wireXfader();
 wireChannelFader('fader-a', deckA);
@@ -69,37 +70,7 @@ document.querySelectorAll('.headphone').forEach(h => {
   h.addEventListener('click', () => { h.classList.toggle('on'); });
 });
 
-let recActive = false, recStart = 0;
-document.getElementById('rec-toggle').addEventListener('click', () => {
-  recActive = !recActive;
-  const strip = document.getElementById('rec');
-  strip.classList.toggle('on', recActive);
-  const t = document.getElementById('rec-toggle');
-  t.textContent = recActive ? "Arrêter" : "Démarrer";
-  t.classList.toggle('active', recActive);
-  if (recActive) recStart = Date.now();
-});
-setInterval(() => {
-  if (recActive) {
-    const s = Math.floor((Date.now() - recStart)/1000);
-    document.getElementById('rec-time').textContent = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-  }
-}, 500);
 
-let broadcasting = false;
-document.getElementById('broadcast-toggle').addEventListener('click', () => {
-  broadcasting = !broadcasting;
-  document.getElementById('broadcast').textContent = broadcasting ? "— en antenne, bonjour Paris" : "— hors antenne";
-  const t = document.getElementById('broadcast-toggle');
-  t.textContent = broadcasting ? "Couper l'antenne" : "Mettre à l'antenne";
-  t.classList.toggle('active', broadcasting);
-});
-
-setInterval(() => {
-  const d = new Date();
-  const p = n => String(n).padStart(2,'0');
-  document.getElementById('clock').textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-}, 1000);
 
 window.addEventListener('keydown', e => {
   if (e.target.tagName === "INPUT") return;
@@ -107,17 +78,17 @@ window.addEventListener('keydown', e => {
   else if (e.key === 'l' || e.key === 'L') togglePlay('b');
   else if (e.key === 'ArrowLeft') adjustXfader(-0.05);
   else if (e.key === 'ArrowRight') adjustXfader(0.05);
-  else if (e.key === 'r' || e.key === 'R') document.getElementById('rec-toggle').click();
+
   else if (e.key === ' ') { e.preventDefault(); if (deckA.playing || deckB.playing) { if(deckA.playing) togglePlay('a'); if(deckB.playing) togglePlay('b'); } }
 });
 
 function applyTweaks(t) {
   document.body.classList.toggle('invert', !!t.invertRig);
   document.getElementById('library').classList.toggle('hidden', !t.showLibrary);
-  document.getElementById('session-name').textContent = t.sessionName || "session sans nom";
   document.getElementById('tw-invert').classList.toggle('on', !!t.invertRig);
   document.getElementById('tw-library').classList.toggle('on', !!t.showLibrary);
-  document.getElementById('tw-session').value = t.sessionName || "";
+  const twSession = document.getElementById('tw-session');
+  if (twSession) twSession.value = t.sessionName || "";
 }
 let tweaks = { ...(window.TWEAK_DEFAULTS || {}) };
 applyTweaks(tweaks);
@@ -139,6 +110,7 @@ window.addEventListener('message', e => {
 try { window.parent.postMessage({type:'__edit_mode_available'}, '*'); } catch(e){}
 
 requestAnimationFrame(animate);
+initMidi();
 (async () => {
   await fetchLibrary();
   renderLibrary();

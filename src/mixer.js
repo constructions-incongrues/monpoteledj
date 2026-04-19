@@ -23,6 +23,27 @@ export function adjustXfader(delta) {
   applyCrossfader();
 }
 
+export function setXfaderVal(v) {
+  xfaderVal = Math.max(0, Math.min(1, v));
+  applyCrossfader();
+  const el = document.getElementById('xfader');
+  if (el) el.value = xfaderVal;
+}
+
+export function setChannelGain(deck, v) {
+  deck.gain.gain.value = v;
+  const id = deck === deckA ? 'fader-a' : 'fader-b';
+  const el = document.getElementById(id);
+  if (el) el.value = v;
+}
+
+export function setEqBand(deck, band, v) {
+  const gain = (v - 0.5) * 18;
+  if (band === 'lo')  deck.lo.gain.setTargetAtTime(gain,  ac.currentTime, 0.02);
+  if (band === 'mid') deck.mid.gain.setTargetAtTime(gain, ac.currentTime, 0.02);
+  if (band === 'hi')  deck.hi.gain.setTargetAtTime(gain,  ac.currentTime, 0.02);
+}
+
 export function wireXfader() {
   const track = document.getElementById('xfader-track');
   let dragging = false;
@@ -106,6 +127,7 @@ export function wirePitch(prefix, deck) {
 export function loadTrack(deckId, trackIdx) {
   const deck = deckId === 'a' ? deckA : deckB;
   const track = LIBRARY[trackIdx];
+  if (!track) return;
   deck.track = track;
   document.getElementById(`artist-${deckId}`).textContent = track.artist;
   document.getElementById(`title-${deckId}`).textContent = track.title;
@@ -159,14 +181,19 @@ export function sync(deckId) {
   document.getElementById(`pitch-${deckId}-input`).dispatchEvent(new Event('input'));
 }
 
-export function renderWave(deckId, track) {
+export function renderWave(deckId, track, amplitudes = null) {
   const el = document.getElementById(`wave-bars-${deckId}`);
   el.innerHTML = "";
   const n = 180;
-  const seed = track.artist.length + track.title.length + track.bpm;
   for (let i = 0; i < n; i++) {
-    const s = Math.sin(i*0.19 + seed) * 0.5 + Math.sin(i*0.07 + seed*0.3) * 0.3 + Math.random()*0.2;
-    const h = Math.max(8, Math.min(100, 40 + s*55));
+    let h;
+    if (amplitudes) {
+      h = Math.max(4, amplitudes[i] * 100);
+    } else {
+      const seed = track.artist.length + track.title.length + (track.bpm || 0);
+      const s = Math.sin(i*0.19 + seed) * 0.5 + Math.sin(i*0.07 + seed*0.3) * 0.3 + Math.random()*0.2;
+      h = Math.max(8, Math.min(100, 40 + s*55));
+    }
     const bar = document.createElement('i');
     bar.style.height = h + "%";
     el.appendChild(bar);
@@ -212,6 +239,19 @@ export async function analyzeTrack(deckId, trackIdx, url) {
   const bpm = detectBpm(decoded);
   const key = detectKey(decoded);
 
+  // Extract RMS amplitude per bar for real waveform
+  const ch = decoded.getChannelData(0);
+  const n = 180;
+  const blockSize = Math.floor(ch.length / n);
+  const amplitudes = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let sum = 0;
+    for (let j = 0; j < blockSize; j++) sum += Math.abs(ch[i * blockSize + j]);
+    amplitudes[i] = sum / blockSize;
+  }
+  const max = Math.max(...amplitudes);
+  if (max > 0) for (let i = 0; i < n; i++) amplitudes[i] /= max;
+
   const track = LIBRARY[trackIdx];
   if (!track) return;
   track.bpm = bpm;
@@ -221,14 +261,14 @@ export async function analyzeTrack(deckId, trackIdx, url) {
   if (deck.track === track) {
     document.getElementById(`bpm-${deckId}`).textContent = bpm ?? '—';
     document.getElementById(`key-${deckId}`).textContent = key || '—';
-    renderWave(deckId, track);
+    renderWave(deckId, track, amplitudes);
   }
 
   const row = document.querySelector(`#library-body tr[data-idx="${trackIdx}"]`);
   if (row) {
     const cells = row.querySelectorAll('td');
-    cells[2].textContent = bpm ?? '—';
-    cells[3].textContent = key || '—';
+    cells[3].textContent = bpm ?? '—';
+    cells[4].textContent = key || '—';
   }
 }
 

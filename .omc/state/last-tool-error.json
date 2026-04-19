@@ -1,7 +1,7 @@
 {
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"git remote -v && rtk git log --oneline -3\",\"description\":\"Check git remote from mix directory\"}",
-  "error": "Exit code 128\nfatal : ni ceci ni aucun de ses répertoires parents n'est un dépôt git : .git",
-  "timestamp": "2026-04-19T21:16:57.246Z",
-  "retry_count": 3
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/Users/tristan/Documents/Workspaces/constructions-incongrues/musiqueapproximative.net/mix/index.html\",\"limit\":1000}",
+  "error": "File content (30894 tokens) exceeds maximum allowed tokens (25000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
+  "timestamp": "2026-04-19T22:17:43.416Z",
+  "retry_count": 2
 }

@@ -63,32 +63,38 @@
   "hotPaths": [
     {
       "path": "index.html",
-      "accessCount": 17,
-      "lastAccessed": 1776633148944,
+      "accessCount": 39,
+      "lastAccessed": 1776637188839,
+      "type": "file"
+    },
+    {
+      "path": "src/main.js",
+      "accessCount": 13,
+      "lastAccessed": 1776637602620,
+      "type": "file"
+    },
+    {
+      "path": "src/mixer.js",
+      "accessCount": 12,
+      "lastAccessed": 1776637058917,
+      "type": "file"
+    },
+    {
+      "path": "src/library.js",
+      "accessCount": 2,
+      "lastAccessed": 1776634814896,
+      "type": "file"
+    },
+    {
+      "path": "docs/plans/2026-04-20-full-shortcuts.md",
+      "accessCount": 2,
+      "lastAccessed": 1776637602679,
       "type": "file"
     },
     {
       "path": "src/audio.js",
       "accessCount": 1,
       "lastAccessed": 1776632904144,
-      "type": "file"
-    },
-    {
-      "path": "src/library.js",
-      "accessCount": 1,
-      "lastAccessed": 1776632925244,
-      "type": "file"
-    },
-    {
-      "path": "src/mixer.js",
-      "accessCount": 1,
-      "lastAccessed": 1776632979713,
-      "type": "file"
-    },
-    {
-      "path": "src/main.js",
-      "accessCount": 1,
-      "lastAccessed": 1776633009059,
       "type": "file"
     },
     {
@@ -113,6 +119,24 @@
       "path": "CNAME",
       "accessCount": 1,
       "lastAccessed": 1776633563360,
+      "type": "file"
+    },
+    {
+      "path": ".claude/launch.json",
+      "accessCount": 1,
+      "lastAccessed": 1776635407931,
+      "type": "file"
+    },
+    {
+      "path": "docs/plans/2026-04-19-midi-support.md",
+      "accessCount": 1,
+      "lastAccessed": 1776636007027,
+      "type": "file"
+    },
+    {
+      "path": "src/midi.test.js",
+      "accessCount": 1,
+      "lastAccessed": 1776636103281,
       "type": "file"
     }
   ],
