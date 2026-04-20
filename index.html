@@ -986,6 +986,46 @@ body {
     .library-head .search { width: 100%; }
     .transport { grid-template-columns: repeat(2, 1fr); }
   }
+
+  /* ---------------- SHORTCUTS HELP DIALOG ---------------- */
+  #shortcuts-help {
+    background: var(--ma-black);
+    color: var(--ma-white);
+    border: 1px solid var(--ma-white);
+    padding: 32px;
+    max-width: 520px;
+    width: 90vw;
+  }
+  #shortcuts-help h3 {
+    font-family: var(--ma-font-display);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 0 0 20px;
+  }
+  #shortcuts-help table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  #shortcuts-help td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  #shortcuts-help td:first-child { white-space: nowrap; }
+  #shortcuts-help kbd {
+    font-family: var(--ma-font-display);
+    font-size: 11px;
+    padding: 1px 5px;
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  #shortcuts-help button {
+    margin-top: 20px;
+    font-family: var(--ma-font-display);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: none;
+    color: var(--ma-white);
+    border: 1px solid var(--ma-white);
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  #shortcuts-help button:hover { background: var(--ma-white); color: var(--ma-black); }
+  #shortcuts-help::backdrop { background: rgba(0,0,0,0.75); }
 </style>
 <link id="gfont-Arvo" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arvo:wght@300;400;500;600;700&amp;display=swap">
 <script>
@@ -1017,11 +1057,12 @@ body {
     <kbd>A</kbd>/<kbd>L</kbd>&nbsp;— play &nbsp;·&nbsp;
     <kbd>Z</kbd>&nbsp;— sync &nbsp;·&nbsp;
     <kbd>C</kbd>&nbsp;— cue &nbsp;·&nbsp;
+    <kbd>V</kbd>&nbsp;— suivant &nbsp;·&nbsp;
     <kbd>1</kbd>&nbsp;<kbd>2</kbd>&nbsp;<kbd>3</kbd>&nbsp;— EQ kill &nbsp;·&nbsp;
     <kbd>←</kbd>&nbsp;<kbd>→</kbd>&nbsp;— xfader &nbsp;·&nbsp;
     <kbd>X</kbd>&nbsp;— centrer &nbsp;·&nbsp;
     <kbd>/</kbd>&nbsp;— chercher &nbsp;·&nbsp;
-    <kbd>Shift</kbd>+<kbd>L</kbd>&nbsp;— biblio
+    <kbd>?</kbd>&nbsp;— aide
   </p>
 
 </header>
@@ -1497,6 +1538,36 @@ body {
   </section>
 
 </div><!-- /.booth -->
+
+<dialog id="shortcuts-help">
+  <h3>Raccourcis clavier</h3>
+  <table>
+    <thead><tr><th>Touche</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Shift</kbd>+<kbd>A</kbd> / <kbd>B</kbd></td><td>Sélectionner deck actif</td></tr>
+      <tr><td><kbd>A</kbd> / <kbd>L</kbd></td><td>Play / pause — Deck A / B</td></tr>
+      <tr><td><kbd>Z</kbd></td><td>Sync tempo — deck actif</td></tr>
+      <tr><td><kbd>C</kbd></td><td>Cue (retour au début) — deck actif</td></tr>
+      <tr><td><kbd>V</kbd></td><td>Morceau suivant — deck actif</td></tr>
+      <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>Kill hi / mid / lo — deck actif</td></tr>
+      <tr><td><kbd>←</kbd> / <kbd>→</kbd></td><td>Crossfader −5% / +5%</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd></td><td>Crossfader fin −1% / +1%</td></tr>
+      <tr><td><kbd>X</kbd></td><td>Crossfader centré</td></tr>
+      <tr><td><kbd>Espace</kbd></td><td>Play / pause — deck actif</td></tr>
+      <tr><td><kbd>/</kbd></td><td>Recherche (puis <kbd>a</kbd>=artiste, <kbd>t</kbd>=titre, <kbd>c</kbd>=contrib)</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>L</kbd></td><td>Ouvrir / fermer bibliothèque</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>1</kbd>–<kbd>5</kbd></td><td>Filtrer par couleur de marque</td></tr>
+      <tr><td><kbd>S</kbd></td><td>Marquer track (cycle 5 couleurs)</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>S</kbd></td><td>Retirer marque</td></tr>
+      <tr><td><kbd>↑</kbd> / <kbd>↓</kbd> / <kbd>j</kbd> / <kbd>k</kbd></td><td>Naviguer dans la bibliothèque</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>Charger track sur deck actif</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>Enter</kbd></td><td>Charger track sur l'autre deck</td></tr>
+      <tr><td><kbd>Escape</kbd></td><td>Fermer bibliothèque / quitter champ</td></tr>
+      <tr><td><kbd>?</kbd></td><td>Cette aide</td></tr>
+    </tbody>
+  </table>
+  <button id="shortcuts-close">Fermer</button>
+</dialog>
 </main>
 
 <footer class="site-foot">

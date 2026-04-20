@@ -165,6 +165,13 @@ function _focusSearch(mode) {
 window.addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey) return;
 
+  // ? — toggle help dialog (works even from input)
+  if (e.key === '?') {
+    const dlg = document.getElementById('shortcuts-help');
+    dlg.open ? dlg.close() : dlg.showModal();
+    return;
+  }
+
   // "/" — start search mode selection; next key selects field (a/t/c), timeout = global
   if (e.key === '/' && e.target.tagName !== 'INPUT') {
     e.preventDefault();
@@ -294,9 +301,21 @@ window.addEventListener('keydown', e => {
   } else if (e.key === 'c' && !e.shiftKey) {
     const deck = activeDeck === 'a' ? deckA : deckB;
     deck.beatIndex = 0;
+  } else if (e.key === 'v' && !e.shiftKey) {
+    const deck = activeDeck === 'a' ? deckA : deckB;
+    const currentIdx = deck.track ? LIBRARY.indexOf(deck.track) : -1;
+    const next = (currentIdx + 1) % LIBRARY.length;
+    loadTrack(activeDeck, next);
   } else if (e.key === 'x') {
     adjustXfader(0.5 - xfaderVal);
   }
+});
+
+// Shortcuts help dialog handlers
+document.getElementById('shortcuts-close')?.addEventListener('click', () =>
+  document.getElementById('shortcuts-help').close());
+document.getElementById('shortcuts-help')?.addEventListener('click', e => {
+  if (e.target === e.currentTarget) e.currentTarget.close();
 });
 
 function applyTweaks(t) {
