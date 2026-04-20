@@ -1,5 +1,6 @@
 import { deckA, deckB } from './audio.js';
 import { fetchLibrary, LIBRARY, renderLibrary, renderPlaylists, populateContribFilter, cycleMark, unmarkTrack, markFilter, setSearchMode } from './library.js';
+import { flemmeMode, toggleFlemme, onTrackEnded } from './flemme.js';
 import { applyCrossfader, adjustXfader, wireXfader, wireChannelFader, wireEq, wirePitch,
          loadTrack, togglePlay, sync, animate,
          toggleFullscreen, navigateHighlight, loadHighlighted, highlightFirst, fullscreenMode, highlightedIdx,
@@ -32,6 +33,77 @@ function toggleEqKill(deckId, band) {
     _eqKill[deckId][band] = null;
   }
   input.dispatchEvent(new Event('input'));
+}
+
+// ── Command Palette ────────────────────────────────────────────────────────
+const COMMANDS = [
+  { id: 'play-a',      name: 'Play / Pause Deck A',      key: 'A',          action: () => togglePlay('a') },
+  { id: 'play-b',      name: 'Play / Pause Deck B',      key: 'L',          action: () => togglePlay('b') },
+  { id: 'play-active', name: 'Play / Pause deck actif',  key: 'Espace',     action: () => togglePlay(activeDeck) },
+  { id: 'sync-active', name: 'Sync tempo',               key: 'Z',          action: () => sync(activeDeck) },
+  { id: 'cue-active',  name: 'Cue (retour début)',       key: 'C',          action: () => { (activeDeck === 'a' ? deckA : deckB).beatIndex = 0; } },
+  { id: 'next-active', name: 'Morceau suivant',          key: 'V',          action: () => { const dk = activeDeck === 'a' ? deckA : deckB; const i = dk.track ? LIBRARY.indexOf(dk.track) : -1; loadTrack(activeDeck, (i + 1) % LIBRARY.length); } },
+  { id: 'select-a',    name: 'Sélectionner Deck A',      key: 'Shift+A',    action: () => setActiveDeck('a') },
+  { id: 'select-b',    name: 'Sélectionner Deck B',      key: 'Shift+B',    action: () => setActiveDeck('b') },
+  { id: 'flemme',      name: 'Mode Flemme (autoplay)',   key: 'F',          action: () => toggleFlemme() },
+  { id: 'xfade-left',  name: 'Crossfader vers A (−5%)',  key: '←',          action: () => adjustXfader(-0.05) },
+  { id: 'xfade-right', name: 'Crossfader vers B (+5%)',  key: '→',          action: () => adjustXfader(0.05) },
+  { id: 'xfade-center',name: 'Crossfader centré',        key: 'X',          action: () => adjustXfader(0.5 - xfaderVal) },
+  { id: 'kill-hi',     name: 'Kill EQ Hi',               key: '1',          action: () => toggleEqKill(activeDeck, 'hi') },
+  { id: 'kill-mid',    name: 'Kill EQ Mid',              key: '2',          action: () => toggleEqKill(activeDeck, 'mid') },
+  { id: 'kill-lo',     name: 'Kill EQ Lo',               key: '3',          action: () => toggleEqKill(activeDeck, 'lo') },
+  { id: 'search',      name: 'Rechercher dans librairie',key: '/',          action: () => _focusSearch('all') },
+  { id: 'library',     name: 'Ouvrir / fermer librairie',key: 'Shift+L',    action: () => toggleFullscreen() },
+  { id: 'help',        name: 'Aide raccourcis',          key: '?',          action: () => document.getElementById('shortcuts-help').showModal() },
+];
+let _cmdSelectedIdx = 0;
+
+function _renderCommandPalette(filter = '') {
+  const list = document.getElementById('command-palette-list');
+  list.innerHTML = '';
+  const q = filter.toLowerCase();
+  let visibleIdx = 0;
+  COMMANDS.forEach((cmd, i) => {
+    const li = document.createElement('li');
+    li.dataset.idx = i;
+    const match = cmd.name.toLowerCase().includes(q) || cmd.key.toLowerCase().includes(q);
+    if (!match) li.classList.add('hidden');
+    else {
+      if (visibleIdx === 0) { li.classList.add('selected'); _cmdSelectedIdx = i; }
+      visibleIdx++;
+    }
+    li.innerHTML = `<span class="cmd-name">${cmd.name}</span><span class="cmd-key">${cmd.key}</span>`;
+    li.addEventListener('click', () => _executeCommand(i));
+    list.appendChild(li);
+  });
+}
+
+function _navigateCommandPalette(delta) {
+  const list = document.getElementById('command-palette-list');
+  const items = Array.from(list.querySelectorAll('li:not(.hidden)'));
+  if (items.length === 0) return;
+  let curIdx = items.findIndex(li => li.classList.contains('selected'));
+  if (curIdx < 0) curIdx = 0;
+  items[curIdx]?.classList.remove('selected');
+  curIdx = (curIdx + delta + items.length) % items.length;
+  items[curIdx]?.classList.add('selected');
+  items[curIdx]?.scrollIntoView({ block: 'nearest' });
+  _cmdSelectedIdx = parseInt(items[curIdx].dataset.idx);
+}
+
+function _executeCommand(idx) {
+  const cmd = COMMANDS[idx];
+  if (cmd) cmd.action();
+  document.getElementById('command-palette').close();
+}
+
+function _openCommandPalette() {
+  const dlg = document.getElementById('command-palette');
+  const input = document.getElementById('command-palette-input');
+  input.value = '';
+  _renderCommandPalette('');
+  dlg.showModal();
+  input.focus();
 }
 
 wireXfader();
@@ -163,6 +235,13 @@ function _focusSearch(mode) {
 }
 
 window.addEventListener('keydown', e => {
+  // Cmd+K / Ctrl+K — open command palette
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    _openCommandPalette();
+    return;
+  }
+
   if (e.ctrlKey || e.metaKey) return;
 
   // ? — toggle help dialog (works even from input)
@@ -308,6 +387,9 @@ window.addEventListener('keydown', e => {
     loadTrack(activeDeck, next);
   } else if (e.key === 'x') {
     adjustXfader(0.5 - xfaderVal);
+  } else if (e.key === 'f' && !e.metaKey && !e.ctrlKey) {
+    e.preventDefault();
+    toggleFlemme();
   }
 });
 
@@ -315,6 +397,19 @@ window.addEventListener('keydown', e => {
 document.getElementById('shortcuts-close')?.addEventListener('click', () =>
   document.getElementById('shortcuts-help').close());
 document.getElementById('shortcuts-help')?.addEventListener('click', e => {
+  if (e.target === e.currentTarget) e.currentTarget.close();
+});
+
+// Command palette handlers
+document.getElementById('command-palette-input')?.addEventListener('input', e =>
+  _renderCommandPalette(e.target.value));
+document.getElementById('command-palette-input')?.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); _navigateCommandPalette(1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); _navigateCommandPalette(-1); }
+  else if (e.key === 'Enter') { e.preventDefault(); _executeCommand(_cmdSelectedIdx); }
+  else if (e.key === 'Escape') { document.getElementById('command-palette').close(); }
+});
+document.getElementById('command-palette')?.addEventListener('click', e => {
   if (e.target === e.currentTarget) e.currentTarget.close();
 });
 

@@ -1026,6 +1026,82 @@ body {
   }
   #shortcuts-help button:hover { background: var(--ma-white); color: var(--ma-black); }
   #shortcuts-help::backdrop { background: rgba(0,0,0,0.75); }
+
+  /* Command Palette */
+  #command-palette {
+    background: var(--ma-black);
+    border: 1px solid var(--ma-white);
+    padding: 0;
+    width: min(500px, 90vw);
+    max-height: 400px;
+    overflow: hidden;
+    font-family: var(--ma-font-body);
+  }
+  #command-palette::backdrop { background: rgba(0,0,0,0.75); }
+  #command-palette-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: var(--ma-font-body);
+    background: var(--ma-black);
+    color: var(--ma-white);
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    outline: none;
+  }
+  #command-palette-input::placeholder { color: var(--ma-gray-mid); }
+  #command-palette-list {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  #command-palette-list li {
+    padding: 10px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #command-palette-list li:hover,
+  #command-palette-list li.selected { background: rgba(255,255,255,0.1); }
+  #command-palette-list li .cmd-name { color: var(--ma-white); }
+  #command-palette-list li .cmd-key {
+    font-family: var(--ma-font-display);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ma-gray-mid);
+  }
+  #command-palette-list li.hidden { display: none; }
+
+  /* Mode Flemme (single deck + autoplay) */
+  .flemme-mode .deck[data-side="b"] { display: none; }
+  .flemme-mode .xfader-wrap { display: none; }
+  .flemme-mode .deck[data-side="a"] {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .flemme-mode .booth {
+    display: flex;
+    justify-content: center;
+  }
+  #flemme-badge {
+    display: none;
+    font-family: var(--ma-font-display);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ma-black);
+    background: var(--ma-green);
+    padding: 3px 10px;
+    margin-left: 12px;
+    border-radius: 2px;
+  }
+  .flemme-mode #flemme-badge { display: inline-block; }
 </style>
 <link id="gfont-Arvo" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arvo:wght@300;400;500;600;700&amp;display=swap">
 <script>
@@ -1058,12 +1134,14 @@ body {
     <kbd>Z</kbd>&nbsp;— sync &nbsp;·&nbsp;
     <kbd>C</kbd>&nbsp;— cue &nbsp;·&nbsp;
     <kbd>V</kbd>&nbsp;— suivant &nbsp;·&nbsp;
+    <kbd>F</kbd>&nbsp;— flemme &nbsp;·&nbsp;
     <kbd>1</kbd>&nbsp;<kbd>2</kbd>&nbsp;<kbd>3</kbd>&nbsp;— EQ kill &nbsp;·&nbsp;
     <kbd>←</kbd>&nbsp;<kbd>→</kbd>&nbsp;— xfader &nbsp;·&nbsp;
     <kbd>X</kbd>&nbsp;— centrer &nbsp;·&nbsp;
     <kbd>/</kbd>&nbsp;— chercher &nbsp;·&nbsp;
     <kbd>?</kbd>&nbsp;— aide
   </p>
+  <span id="flemme-badge">Mode F</span>
 
 </header>
 
@@ -1539,6 +1617,11 @@ body {
 
 </div><!-- /.booth -->
 
+<dialog id="command-palette">
+  <input type="text" id="command-palette-input" placeholder="Tapez une commande…" autocomplete="off">
+  <ul id="command-palette-list"></ul>
+</dialog>
+
 <dialog id="shortcuts-help">
   <h3>Raccourcis clavier</h3>
   <table>
@@ -1549,6 +1632,7 @@ body {
       <tr><td><kbd>Z</kbd></td><td>Sync tempo — deck actif</td></tr>
       <tr><td><kbd>C</kbd></td><td>Cue (retour au début) — deck actif</td></tr>
       <tr><td><kbd>V</kbd></td><td>Morceau suivant — deck actif</td></tr>
+      <tr><td><kbd>F</kbd></td><td>Mode Flemme (autoplay)</td></tr>
       <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>Kill hi / mid / lo — deck actif</td></tr>
       <tr><td><kbd>←</kbd> / <kbd>→</kbd></td><td>Crossfader −5% / +5%</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd></td><td>Crossfader fin −1% / +1%</td></tr>
