@@ -101,10 +101,18 @@ function _openCommandPalette() {
   const dlg = document.getElementById('command-palette');
   const input = document.getElementById('command-palette-input');
   if (!dlg || !input) return;
+  if (dlg.open) {
+    input.focus();
+    return;
+  }
   _dismissCommandPaletteHint();
   input.value = '';
   _renderCommandPalette('');
-  dlg.showModal();
+  try {
+    dlg.showModal();
+  } catch {
+    return;
+  }
   input.focus();
 }
 
