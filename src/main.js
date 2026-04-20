@@ -7,6 +7,18 @@ import { applyCrossfader, adjustXfader, wireXfader, wireChannelFader, wireEq, wi
          xfaderVal } from './mixer.js';
 import { initMidi } from './midi.js';
 
+// ── Status bar updater ─────────────────────────────────────────────────────
+function updateStatusBar() {
+  const deck = activeDeck === 'a' ? deckA : deckB;
+  const track = deck.track;
+  const bpm = track?.bpm ?? null;
+  const key = track?.key ?? null;
+  const isFlemme = document.body.classList.contains('flemme-mode');
+  const mode = isFlemme ? 'Flemme' : 'Normal';
+  
+  window.updateStatusBar?.(bpm, key, mode);
+}
+
 // ── Active deck state ──────────────────────────────────────────────────────
 let activeDeck = 'a'; // 'a' | 'b' — persistent selection
 
@@ -37,26 +49,34 @@ function toggleEqKill(deckId, band) {
 
 // ── Command Palette ────────────────────────────────────────────────────────
 const COMMANDS = [
-  { id: 'play-a',      name: 'Play / Pause Deck A',      key: 'A',          action: () => togglePlay('a') },
-  { id: 'play-b',      name: 'Play / Pause Deck B',      key: 'L',          action: () => togglePlay('b') },
-  { id: 'play-active', name: 'Play / Pause deck actif',  key: 'Espace',     action: () => togglePlay(activeDeck) },
-  { id: 'sync-active', name: 'Sync tempo',               key: 'Z',          action: () => sync(activeDeck) },
-  { id: 'cue-active',  name: 'Cue (retour début)',       key: 'C',          action: () => { (activeDeck === 'a' ? deckA : deckB).beatIndex = 0; } },
-  { id: 'next-active', name: 'Morceau suivant',          key: 'V',          action: () => { const dk = activeDeck === 'a' ? deckA : deckB; const i = dk.track ? LIBRARY.indexOf(dk.track) : -1; loadTrack(activeDeck, (i + 1) % LIBRARY.length); } },
-  { id: 'select-a',    name: 'Sélectionner Deck A',      key: 'Shift+A',    action: () => setActiveDeck('a') },
-  { id: 'select-b',    name: 'Sélectionner Deck B',      key: 'Shift+B',    action: () => setActiveDeck('b') },
-  { id: 'flemme',      name: 'Mode Flemme (autoplay)',   key: 'F',          action: () => toggleFlemme() },
-  { id: 'xfade-left',  name: 'Crossfader vers A (−5%)',  key: '←',          action: () => adjustXfader(-0.05) },
-  { id: 'xfade-right', name: 'Crossfader vers B (+5%)',  key: '→',          action: () => adjustXfader(0.05) },
-  { id: 'xfade-center',name: 'Crossfader centré',        key: 'X',          action: () => adjustXfader(0.5 - xfaderVal) },
-  { id: 'kill-hi',     name: 'Kill EQ Hi',               key: '1',          action: () => toggleEqKill(activeDeck, 'hi') },
-  { id: 'kill-mid',    name: 'Kill EQ Mid',              key: '2',          action: () => toggleEqKill(activeDeck, 'mid') },
-  { id: 'kill-lo',     name: 'Kill EQ Lo',               key: '3',          action: () => toggleEqKill(activeDeck, 'lo') },
-  { id: 'search',      name: 'Rechercher dans librairie',key: '/',          action: () => _focusSearch('all') },
-  { id: 'library',     name: 'Ouvrir / fermer librairie',key: 'Shift+L',    action: () => toggleFullscreen() },
-  { id: 'help',        name: 'Aide raccourcis',          key: '?',          action: () => document.getElementById('shortcuts-help').showModal() },
+  { id: 'play-a',      name: 'Play / Pause Deck A',      desc: 'Lance ou stoppe immédiatement le deck A.', aliases: ['deck a', 'lecture a', 'pause a'], key: 'A',          action: () => togglePlay('a') },
+  { id: 'play-b',      name: 'Play / Pause Deck B',      desc: 'Lance ou stoppe immédiatement le deck B.', aliases: ['deck b', 'lecture b', 'pause b'], key: 'L',          action: () => togglePlay('b') },
+  { id: 'play-active', name: 'Play / Pause deck actif',  desc: 'Contrôle le deck actuellement sélectionné.', aliases: ['deck actif', 'play', 'pause'], key: 'Espace',     action: () => togglePlay(activeDeck) },
+  { id: 'sync-active', name: 'Sync tempo',               desc: 'Aligne le tempo du deck actif.', aliases: ['sync', 'tempo', 'bpm'], key: 'Z',          action: () => sync(activeDeck) },
+  { id: 'cue-active',  name: 'Cue (retour début)',       desc: 'Replace la lecture du deck actif au début.', aliases: ['cue', 'retour', 'debut'], key: 'C',          action: () => { (activeDeck === 'a' ? deckA : deckB).beatIndex = 0; } },
+  { id: 'next-active', name: 'Morceau suivant',          desc: 'Charge le morceau suivant sur le deck actif.', aliases: ['suivant', 'next', 'track'], key: 'V',          action: () => { const dk = activeDeck === 'a' ? deckA : deckB; const i = dk.track ? LIBRARY.indexOf(dk.track) : -1; loadTrack(activeDeck, (i + 1) % LIBRARY.length); } },
+  { id: 'select-a',    name: 'Sélectionner Deck A',      desc: 'Passe le focus de contrôle au deck A.', aliases: ['focus a', 'actif a'], key: 'Shift+A',    action: () => setActiveDeck('a') },
+  { id: 'select-b',    name: 'Sélectionner Deck B',      desc: 'Passe le focus de contrôle au deck B.', aliases: ['focus b', 'actif b'], key: 'Shift+B',    action: () => setActiveDeck('b') },
+  { id: 'flemme',      name: 'Mode Flemme (autoplay)',   desc: 'Active le mode lecture simplifiée automatique.', aliases: ['autoplay', 'flemme', 'mode'], key: 'F',          action: () => toggleFlemme() },
+  { id: 'xfade-left',  name: 'Crossfader vers A (−5%)',  desc: 'Décale le crossfader de 5% vers le deck A.', aliases: ['crossfader', 'gauche', 'mix'], key: '←',          action: () => adjustXfader(-0.05) },
+  { id: 'xfade-right', name: 'Crossfader vers B (+5%)',  desc: 'Décale le crossfader de 5% vers le deck B.', aliases: ['crossfader', 'droite', 'mix'], key: '→',          action: () => adjustXfader(0.05) },
+  { id: 'xfade-center',name: 'Crossfader centré',        desc: 'Replace le crossfader exactement au centre.', aliases: ['crossfader centre', 'center', 'milieu'], key: 'X',          action: () => adjustXfader(0.5 - xfaderVal) },
+  { id: 'kill-hi',     name: 'Kill EQ Hi',               desc: 'Coupe instantanément les hautes fréquences.', aliases: ['eq hi', 'high', 'aigus'], key: '1',          action: () => toggleEqKill(activeDeck, 'hi') },
+  { id: 'kill-mid',    name: 'Kill EQ Mid',              desc: 'Coupe instantanément les médiums.', aliases: ['eq mid', 'medium', 'mediums'], key: '2',          action: () => toggleEqKill(activeDeck, 'mid') },
+  { id: 'kill-lo',     name: 'Kill EQ Lo',               desc: 'Coupe instantanément les basses.', aliases: ['eq lo', 'low', 'basses'], key: '3',          action: () => toggleEqKill(activeDeck, 'lo') },
+  { id: 'search',      name: 'Rechercher dans librairie',desc: 'Place le focus dans la recherche de bibliothèque.', aliases: ['recherche', 'search', 'library', 'librairie'], key: '/',          action: () => _focusSearch('all') },
+  { id: 'library',     name: 'Ouvrir / fermer librairie',desc: 'Bascule la bibliothèque en plein écran.', aliases: ['fullscreen', 'bibliotheque', 'plein ecran'], key: 'Shift+L',    action: () => toggleFullscreen() },
+  { id: 'help',        name: 'Ouvrir les raccourcis clavier', desc: 'Affiche l’aide complète des raccourcis.', aliases: ['aide', 'help', 'raccourcis', 'shortcut'], key: '?',      action: () => document.getElementById('shortcuts-help').showModal() },
 ];
 let _cmdSelectedIdx = 0;
+
+function _commandMatches(cmd, query) {
+  if (!query) return true;
+  const haystack = [cmd.name, cmd.desc, cmd.key, ...(cmd.aliases || [])]
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(query);
+}
 
 function _renderCommandPalette(filter = '') {
   const list = document.getElementById('command-palette-list');
@@ -66,16 +86,22 @@ function _renderCommandPalette(filter = '') {
   COMMANDS.forEach((cmd, i) => {
     const li = document.createElement('li');
     li.dataset.idx = i;
-    const match = cmd.name.toLowerCase().includes(q) || cmd.key.toLowerCase().includes(q);
+    const match = _commandMatches(cmd, q);
     if (!match) li.classList.add('hidden');
     else {
       if (visibleIdx === 0) { li.classList.add('selected'); _cmdSelectedIdx = i; }
       visibleIdx++;
     }
-    li.innerHTML = `<span class="cmd-name">${cmd.name}</span><span class="cmd-key">${cmd.key}</span>`;
+    li.innerHTML = `<span class="cmd-meta"><span class="cmd-name">${cmd.name}</span><span class="cmd-desc">${cmd.desc}</span></span><span class="cmd-key">${cmd.key}</span>`;
     li.addEventListener('click', () => _executeCommand(i));
     list.appendChild(li);
   });
+  if (visibleIdx === 0) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.innerHTML = `<span class="cmd-name">Aucune commande trouvée</span><span class="cmd-desc">Essaie aide, deck, librairie, flemme ou crossfader.</span>`;
+    list.appendChild(li);
+  }
 }
 
 function _navigateCommandPalette(delta) {
@@ -175,7 +201,7 @@ function applyMarkFilter(marks) {
 
 document.getElementById('library-body').addEventListener('click', e => {
   const b = e.target.closest('[data-load]');
-  if (b) { loadTrack(b.dataset.load, parseInt(b.dataset.idx)); e.stopPropagation(); return; }
+  if (b) { loadTrack(b.dataset.load, parseInt(b.dataset.idx)); updateStatusBar(); e.stopPropagation(); return; }
   const td = e.target.closest('td[data-contrib]');
   if (td) {
     const contrib = td.dataset.contrib;
@@ -188,7 +214,7 @@ document.getElementById('library-body').addEventListener('click', e => {
 
 document.getElementById('playlists').addEventListener('click', e => {
   const b = e.target.closest('[data-load]');
-  if (b) { loadTrack(b.dataset.load, parseInt(b.dataset.idx)); e.stopPropagation(); return; }
+  if (b) { loadTrack(b.dataset.load, parseInt(b.dataset.idx)); updateStatusBar(); e.stopPropagation(); return; }
   // Flemme playlist: click row to load + play on deck A
   if (flemmeMode) {
     const row = e.target.closest('tr[data-pos]');
@@ -197,6 +223,7 @@ document.getElementById('playlists').addEventListener('click', e => {
       const idx = parseInt(row.dataset.idx);
       setFlemmeIndex(pos);
       loadTrack('a', idx);
+      updateStatusBar();
       updateFlemmeHighlight(pos);
       setTimeout(() => { if (deckA.audio && deckA.audio.paused) togglePlay('a'); }, 100);
     }
@@ -209,6 +236,7 @@ document.getElementById('library-body').addEventListener('dblclick', e => {
   if (!deckA.track) loadTrack('a', idx);
   else if (!deckB.track) loadTrack('b', idx);
   else loadTrack('a', idx);
+  updateStatusBar();
 });
 
 document.querySelectorAll('.transport .btn').forEach(b => {
@@ -226,6 +254,7 @@ document.querySelectorAll('.transport .btn').forEach(b => {
       const currentIdx = deck.track ? LIBRARY.indexOf(deck.track) : -1;
       const next = (currentIdx + 1) % LIBRARY.length;
       loadTrack(deckId, next);
+      updateStatusBar();
     }
   });
 });
@@ -442,17 +471,11 @@ window.addEventListener('keydown', e => {
   } else if (e.key === 'f' && !e.metaKey && !e.ctrlKey) {
     e.preventDefault();
     toggleFlemme();
+    updateStatusBar();
   }
 });
 
 // Shortcuts help dialog handlers
-document.getElementById('shortcuts-help-open')?.addEventListener('click', () => {
-  const dialog = document.getElementById('shortcuts-help');
-  if (dialog && !dialog.open) dialog.showModal();
-});
-document.getElementById('mode-toggle-btn')?.addEventListener('click', () => {
-  toggleFlemme();
-});
 document.getElementById('shortcuts-close')?.addEventListener('click', () =>
   document.getElementById('shortcuts-help').close());
 document.getElementById('shortcuts-help')?.addEventListener('click', e => {
@@ -546,4 +569,5 @@ initMidi();
   populateContribFilter();
   if (LIBRARY.length > 0) loadTrack('a', 0);
   if (LIBRARY.length > 1) loadTrack('b', 1);
+  updateStatusBar();
 })();
