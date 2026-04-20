@@ -384,6 +384,11 @@ body {
     position: relative;
   }
   .deck[data-side="b"] { }
+  .deck.deck-active .corner.tl {
+    background: #fff; color: #000;
+    padding: 1px 6px; letter-spacing: 0.2em;
+  }
+  .deck.deck-active { outline: 2px solid rgba(255,255,255,0.7); }
   .deck .corner {
     position: absolute; top: 10px; font-family: var(--ma-font-display);
     font-size: 11px; letter-spacing: 0.3em;
@@ -704,7 +709,8 @@ body {
   .mark-pip {
     display: inline-flex; align-items: center; justify-content: center;
     width: 16px; height: 16px; border-radius: 50%; vertical-align: middle;
-    font-family: var(--ma-font-display); font-size: 9px; color: #fff; line-height: 1;
+    font-family: var(--ma-font-display); font-size: 9px; color: currentColor; line-height: 1;
+    border: 1px solid currentColor; background: transparent;
   }
 
   /* Mark filter buttons */
@@ -716,13 +722,11 @@ body {
   }
   .mark-filter-btn:hover { color: #000; border-color: #000; }
   .mark-filter-btn.active { border-color: #000; color: #000; font-weight: bold; }
-  .mark-dot { width: 18px; height: 18px; border-radius: 50%; border: none !important; padding: 0 !important;
-    font-family: var(--ma-font-display); font-size: 10px; color: #fff; display: inline-flex; align-items: center; justify-content: center; }
-  .mark-dot.mark-1 { background: #e05; }
-  .mark-dot.mark-2 { background: #0a5; }
-  .mark-dot.mark-3 { background: #07f; }
-  .mark-dot.mark-4 { background: #f80; }
-  .mark-dot.mark-5 { background: #a0f; }
+  .mark-dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid #000 !important; padding: 0 !important;
+    font-family: var(--ma-font-display); font-size: 10px; color: #000; background: transparent;
+    display: inline-flex; align-items: center; justify-content: center; }
+  .mark-dot:hover { background: #000; color: #fff; }
+  .mark-dot.active, .mark-filter-btn.mark-dot.active { background: #000 !important; color: #fff !important; border-color: #000 !important; font-weight: bold; }
   .mark-shift-hint {
     font-family: var(--ma-font-mono); font-size: 9px; line-height: 1;
     background: #000; color: #fff; padding: 2px 4px; border-radius: 2px;
@@ -738,6 +742,14 @@ body {
   }
   .mark-dot.mark-dot-zero:hover { border-color: #000 !important; color: #000; }
   .mark-filter-btn.mark-empty { opacity: 0.3; }
+
+  /* Mark filters in master-strip (black background) */
+  .master-strip .mark-shift-hint { background: var(--ma-white); color: var(--ma-black); }
+  .master-strip .mark-dot { border-color: var(--ma-white); color: var(--ma-white); }
+  .master-strip .mark-dot:hover { background: var(--ma-white); color: var(--ma-black); }
+  .master-strip .mark-dot.active { background: var(--ma-white); color: var(--ma-black); }
+  .master-strip .mark-dot.mark-dot-zero { border-color: var(--ma-gray-mid); color: var(--ma-gray-mid); }
+  .master-strip .mark-dot.mark-dot-zero:hover { border-color: var(--ma-white) !important; color: var(--ma-black); background: var(--ma-white); }
   .smode-btns { display: flex; align-items: center; gap: 1px; }
   .smode-btn {
     font-family: var(--ma-font-mono); font-size: 11px; line-height: 1;
@@ -838,6 +850,7 @@ body {
   .library-table td.num { font-family: var(--ma-font-display); text-align: right; }
   .library-table td.contrib { color: var(--ma-gray-dark); font-size: 11px; width: 50px; max-width: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .library-table tbody tr:hover td.contrib { color: var(--ma-gray-light); }
+  body.using-keyboard .library-table tbody tr:hover td.contrib { color: var(--ma-gray-dark); }
   .library-table td.loadcell { width: 120px; text-align: right; }
   .load-btn {
     font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
@@ -848,8 +861,11 @@ body {
   .load-btn:hover { background: currentColor; }
   .load-btn:hover span { color: #fff; mix-blend-mode: difference; }
   tbody tr:hover .load-btn { color: #fff; border-color: #fff; }
-  body.deck-a-loaded .load-btn[data-load="a"],
-  body.deck-b-loaded .load-btn[data-load="b"] {
+  body.using-keyboard .load-btn:hover { background: none; }
+  body.using-keyboard .load-btn:hover span { color: inherit; mix-blend-mode: normal; }
+  body.using-keyboard tbody tr:hover .load-btn { color: inherit; border-color: transparent; }
+  #library-body tr.loaded-a .load-btn[data-load="a"],
+  #library-body tr.loaded-b .load-btn[data-load="b"] {
     background: var(--ma-white) !important; color: var(--ma-black) !important;
     border-color: var(--ma-white) !important; pointer-events: none;
   }
@@ -867,6 +883,8 @@ body {
   td.contrib[data-contrib] { cursor: pointer; }
   td.contrib[data-contrib]:hover { text-decoration: underline; }
   body.using-keyboard td.contrib[data-contrib]:hover { text-decoration: none; }
+  #contrib-a, #contrib-b { cursor: pointer; }
+  #contrib-a:hover, #contrib-b:hover { text-decoration: underline; }
   .playlists { display: flex; flex-wrap: nowrap; width: 100%; background: #fff; border-top: 2px solid #000; grid-column: 1 / -1; }
   .playlists:empty { display: none; }
   .playlist { flex: 1; min-width: 0; border-right: 1px solid #eee; overflow: hidden; }
@@ -995,23 +1013,38 @@ body {
     <div class="wordmark">MUSIQUE APPROXIMATIVE<small>MON POTE LE DJ</small></div>
   </a>
   <p class="masthead-shortcuts">
-    <kbd>A</kbd>&nbsp;/&nbsp;<kbd>L</kbd>&nbsp;— play &nbsp;·&nbsp;
+    <kbd>Shift</kbd>+<kbd>A</kbd>/<kbd>B</kbd>&nbsp;— deck &nbsp;·&nbsp;
+    <kbd>A</kbd>/<kbd>L</kbd>&nbsp;— play &nbsp;·&nbsp;
+    <kbd>Z</kbd>&nbsp;— sync &nbsp;·&nbsp;
+    <kbd>C</kbd>&nbsp;— cue &nbsp;·&nbsp;
+    <kbd>1</kbd>&nbsp;<kbd>2</kbd>&nbsp;<kbd>3</kbd>&nbsp;— EQ kill &nbsp;·&nbsp;
     <kbd>←</kbd>&nbsp;<kbd>→</kbd>&nbsp;— xfader &nbsp;·&nbsp;
-    <kbd>Espace</kbd>&nbsp;— pause &nbsp;·&nbsp;
-    <kbd>Shift</kbd>+<kbd>B</kbd>&nbsp;— biblio &nbsp;·&nbsp;
-    <kbd>/</kbd>&nbsp;— chercher
+    <kbd>X</kbd>&nbsp;— centrer &nbsp;·&nbsp;
+    <kbd>/</kbd>&nbsp;— chercher &nbsp;·&nbsp;
+    <kbd>Shift</kbd>+<kbd>L</kbd>&nbsp;— biblio
   </p>
 
 </header>
 
 <section class="master-strip">
 
-  <span id="midi-status" style="font-family:var(--ma-font-display);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ma-gray-mid);padding:0 12px;white-space:nowrap;"></span>
+  <div class="mark-filters" id="mark-filters">
+    <kbd class="mark-shift-hint">Shift</kbd>
+    <button class="mark-filter-btn mark-dot mark-1" data-marks="1" title="Couleur 1">1</button>
+    <button class="mark-filter-btn mark-dot mark-2" data-marks="2" title="Couleur 2">2</button>
+    <button class="mark-filter-btn mark-dot mark-3" data-marks="3" title="Couleur 3">3</button>
+    <button class="mark-filter-btn mark-dot mark-4" data-marks="4" title="Couleur 4">4</button>
+    <button class="mark-filter-btn mark-dot mark-5" data-marks="5" title="Couleur 5">5</button>
+    <button class="mark-filter-btn mark-dot mark-dot-zero" data-marks="0" title="Tout afficher (Shift+0)">0</button>
+  </div>
 
   <div class="master-meter">
     <span class="label">Master</span>
     <div class="vu" id="vu-master"></div>
   </div>
+
+  <span id="midi-status" style="font-family:var(--ma-font-display);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ma-gray-mid);padding:0 12px;white-space:nowrap;text-align:right;"></span>
+
 </section>
 
 <main class="rig">
@@ -1231,7 +1264,7 @@ body {
         <button class="smode-btn" data-mode="contrib" title="Par contributeur (/c)">c</button>
       </div>
       <input class="search" id="library-search" placeholder="Chercher…" type="search">
-      <div class="mark-filters" id="mark-filters">
+      <div class="mark-filters" id="lib-mark-filters">
         <button class="mark-filter-btn" data-marks="-1" title="Tous les favoris">★</button>
         <kbd class="mark-shift-hint">Shift</kbd>
         <button class="mark-filter-btn mark-dot mark-1" data-marks="1" title="Couleur 1">1</button>
@@ -1244,7 +1277,7 @@ body {
       <p class="lib-shortcuts">
         <kbd>/</kbd>&nbsp;chercher &nbsp;·&nbsp;
         <kbd>/a</kbd>&nbsp;artiste &nbsp;<kbd>/t</kbd>&nbsp;titre &nbsp;<kbd>/c</kbd>&nbsp;contrib &nbsp;·&nbsp;
-        <kbd>s</kbd>&nbsp;— pastille&nbsp;<span class="mark-pip" style="background:#e05">1</span><span class="mark-pip" style="background:#0a5">2</span><span class="mark-pip" style="background:#07f">3</span><span class="mark-pip" style="background:#f80">4</span><span class="mark-pip" style="background:#a0f">5</span>&nbsp;·&nbsp;
+        <kbd>s</kbd>&nbsp;— pastille&nbsp;<span class="mark-pip">1</span><span class="mark-pip">2</span><span class="mark-pip">3</span><span class="mark-pip">4</span><span class="mark-pip">5</span>&nbsp;·&nbsp;
         <kbd>Shift</kbd>+<kbd>s</kbd>&nbsp;— effacer &nbsp;·&nbsp;
         <kbd>Shift</kbd>+<kbd>1–5</kbd>&nbsp;— filtrer &nbsp;·&nbsp;
         <kbd>Shift</kbd>+<kbd>0</kbd>&nbsp;<span class="mark-pip mark-pip-zero">0</span>&nbsp;— désactiver &nbsp;·&nbsp;

@@ -97,13 +97,12 @@ export function renderLibrary(filter = "", contribFilter = "", markOnly = 0) {
     matches.push({ t, i });
   });
   const visible = matches.slice(0, LIBRARY_PAGE);
-  const MARK_COLORS = ['', '#e05', '#0a5', '#07f', '#f80', '#a0f'];
   visible.forEach(({ t, i }) => {
     const tr = document.createElement('tr');
     tr.dataset.idx = i;
     if (t.mark) tr.classList.add('mark-' + t.mark);
     const pip = t.mark
-      ? `<span class="mark-pip" style="background:${MARK_COLORS[t.mark]}">${t.mark}</span>`
+      ? `<span class="mark-pip">${t.mark}</span>`
       : '';
     tr.innerHTML = `
       <td class="mark-cell">${pip}</td>
@@ -135,8 +134,6 @@ export function renderLibrary(filter = "", contribFilter = "", markOnly = 0) {
   }
 }
 
-const PLAYLIST_COLORS = ['', '#e05', '#0a5', '#07f', '#f80', '#a0f'];
-
 export function renderPlaylists() {
   const container = document.getElementById('playlists');
   if (!container) return;
@@ -148,7 +145,7 @@ export function renderPlaylists() {
     section.className = 'playlist';
     section.innerHTML = `
       <div class="playlist-head">
-        <span class="mark-pip" style="background:${PLAYLIST_COLORS[c]}">${c}</span>
+        <span class="mark-pip">${c}</span>
         <span class="playlist-count">${tracks.length} morceau${tracks.length > 1 ? 'x' : ''}</span>
       </div>
       <table class="playlist-table"><tbody>${tracks.map(({ t, i }) => `

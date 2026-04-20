@@ -169,7 +169,6 @@ export function loadTrack(deckId, trackIdx) {
   const track = LIBRARY[trackIdx];
   if (!track) return;
   deck.track = track;
-  document.body.classList.add(`deck-${deckId}-loaded`);
   document.getElementById(`artist-${deckId}`).textContent = track.artist;
   document.getElementById(`title-${deckId}`).textContent = track.title;
   document.getElementById(`contrib-${deckId}`).textContent = track.contrib;
@@ -268,9 +267,20 @@ export function renderGlitch(deckId, track) {
   }
 }
 
-export function analyzeTrack(deckId, trackIdx, url) {
+export async function analyzeTrack(deckId, trackIdx, url) {
   if (!url) return;
-  _getWorker().postMessage({ url, trackIdx });
+  try {
+    const res = await fetch(url);
+    const buf = await res.arrayBuffer();
+    const decoded = await ac.decodeAudioData(buf);
+    const ch = decoded.getChannelData(0).slice(); // slice() = new transferable buffer
+    _getWorker().postMessage(
+      { trackIdx, channelData: ch, sampleRate: decoded.sampleRate, duration: decoded.duration },
+      [ch.buffer]
+    );
+  } catch(e) {
+    console.warn('analyzeTrack decode failed:', e);
+  }
 }
 
 export function buildMeter(el, n) {
@@ -420,4 +430,10 @@ export function loadHighlighted(deckId) {
   if (highlightedIdx >= 0) {
     loadTrack(deckId, highlightedIdx);
   }
+}
+
+export function highlightFirst() {
+  highlightedIdx = -1;
+  clearHighlight();
+  navigateHighlight(1);
 }

@@ -63,26 +63,26 @@
   "hotPaths": [
     {
       "path": "index.html",
-      "accessCount": 113,
-      "lastAccessed": 1776647136155,
+      "accessCount": 154,
+      "lastAccessed": 1776666072707,
       "type": "file"
     },
     {
       "path": "src/main.js",
-      "accessCount": 51,
-      "lastAccessed": 1776647051001,
+      "accessCount": 72,
+      "lastAccessed": 1776665591996,
       "type": "file"
     },
     {
       "path": "src/mixer.js",
-      "accessCount": 33,
-      "lastAccessed": 1776647133329,
+      "accessCount": 41,
+      "lastAccessed": 1776665176108,
       "type": "file"
     },
     {
       "path": "src/library.js",
-      "accessCount": 20,
-      "lastAccessed": 1776647045816,
+      "accessCount": 24,
+      "lastAccessed": 1776663000575,
       "type": "file"
     },
     {
@@ -98,21 +98,33 @@
       "type": "directory"
     },
     {
-      "path": "docs/plans/2026-04-20-full-shortcuts.md",
-      "accessCount": 2,
-      "lastAccessed": 1776637602679,
+      "path": "src/analyzer.worker.js",
+      "accessCount": 3,
+      "lastAccessed": 1776661460277,
+      "type": "file"
+    },
+    {
+      "path": "docs/plans/2026-04-20-feature-ideas.md",
+      "accessCount": 3,
+      "lastAccessed": 1776661497047,
       "type": "file"
     },
     {
       "path": "",
-      "accessCount": 2,
-      "lastAccessed": 1776643322905,
+      "accessCount": 3,
+      "lastAccessed": 1776664232779,
       "type": "directory"
     },
     {
-      "path": "src/analyzer.worker.js",
+      "path": "docs/plans/2026-04-20-full-shortcuts.md",
+      "accessCount": 3,
+      "lastAccessed": 1776664237473,
+      "type": "file"
+    },
+    {
+      "path": ".claude/launch.json",
       "accessCount": 2,
-      "lastAccessed": 1776647182083,
+      "lastAccessed": 1776662457153,
       "type": "file"
     },
     {
@@ -134,12 +146,6 @@
       "type": "file"
     },
     {
-      "path": ".claude/launch.json",
-      "accessCount": 1,
-      "lastAccessed": 1776635407931,
-      "type": "file"
-    },
-    {
       "path": "docs/plans/2026-04-19-midi-support.md",
       "accessCount": 1,
       "lastAccessed": 1776636007027,
@@ -152,9 +158,15 @@
       "type": "file"
     },
     {
-      "path": "docs/plans/2026-04-20-feature-ideas.md",
+      "path": "design-demo.html",
       "accessCount": 1,
-      "lastAccessed": 1776643543512,
+      "lastAccessed": 1776662515253,
+      "type": "file"
+    },
+    {
+      "path": "src/midi.js",
+      "accessCount": 1,
+      "lastAccessed": 1776664229212,
       "type": "file"
     }
   ],

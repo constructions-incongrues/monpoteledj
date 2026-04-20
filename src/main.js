@@ -1,11 +1,41 @@
 import { deckA, deckB } from './audio.js';
 import { fetchLibrary, LIBRARY, renderLibrary, renderPlaylists, populateContribFilter, cycleMark, unmarkTrack, markFilter, setSearchMode } from './library.js';
 import { applyCrossfader, adjustXfader, wireXfader, wireChannelFader, wireEq, wirePitch,
-         loadTrack, togglePlay, sync, animate, 
-         toggleFullscreen, navigateHighlight, loadHighlighted, fullscreenMode, highlightedIdx } from './mixer.js';
+         loadTrack, togglePlay, sync, animate,
+         toggleFullscreen, navigateHighlight, loadHighlighted, highlightFirst, fullscreenMode, highlightedIdx,
+         xfaderVal } from './mixer.js';
 import { initMidi } from './midi.js';
 
+// ── Active deck state ──────────────────────────────────────────────────────
+let activeDeck = 'a'; // 'a' | 'b' — persistent selection
+
+function setActiveDeck(id) {
+  activeDeck = id;
+  document.querySelectorAll('.deck').forEach(d =>
+    d.classList.toggle('deck-active', d.dataset.side === id));
+}
+
+// ── EQ Kill state ──────────────────────────────────────────────────────────
+const _eqKill = { a: { hi: null, mid: null, lo: null },
+                  b: { hi: null, mid: null, lo: null } };
+
+function toggleEqKill(deckId, band) {
+  const input = document.getElementById(`${band}-${deckId}`);
+  if (!input) return;
+  const min = parseFloat(input.min); // −24
+  const current = parseFloat(input.value);
+  if (current > min) {
+    _eqKill[deckId][band] = current;
+    input.value = min;
+  } else {
+    input.value = _eqKill[deckId][band] ?? 0;
+    _eqKill[deckId][band] = null;
+  }
+  input.dispatchEvent(new Event('input'));
+}
+
 wireXfader();
+setActiveDeck('a'); // initialise l'indicateur visuel au chargement
 wireChannelFader('fader-a', deckA);
 wireChannelFader('fader-b', deckB);
 wireEq('a', deckA);
@@ -23,15 +53,23 @@ document.getElementById('search-modes').addEventListener('click', e => {
   _focusSearch(btn.dataset.mode);
 });
 
-document.getElementById('mark-filters').addEventListener('click', e => {
-  const btn = e.target.closest('.mark-filter-btn');
-  if (!btn) return;
-  const marks = parseInt(btn.dataset.marks);
-  document.querySelectorAll('.mark-filter-btn').forEach(b => b.classList.remove('active'));
-  if (marks !== 0) btn.classList.add('active');
+function applyMarkFilter(marks) {
+  document.querySelectorAll('.mark-filter-btn').forEach(b => {
+    b.classList.toggle('active', marks !== 0 && parseInt(b.dataset.marks) === marks);
+  });
   renderLibrary(document.getElementById('library-search').value,
                 document.getElementById('contrib-filter').value,
                 marks);
+}
+
+['mark-filters', 'lib-mark-filters'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', e => {
+    const btn = e.target.closest('.mark-filter-btn');
+    if (!btn) return;
+    applyMarkFilter(parseInt(btn.dataset.marks));
+  });
 });
 
 document.getElementById('library-body').addEventListener('click', e => {
@@ -125,6 +163,8 @@ function _focusSearch(mode) {
 }
 
 window.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey) return;
+
   // "/" — start search mode selection; next key selects field (a/t/c), timeout = global
   if (e.key === '/' && e.target.tagName !== 'INPUT') {
     e.preventDefault();
@@ -152,6 +192,13 @@ window.addEventListener('keydown', e => {
     }
   }
 
+  // EQ Kill 1/2/3 — deck actif (toggle)
+  const EQ_KILL_KEYS = { '1': 'hi', '2': 'mid', '3': 'lo' };
+  if (EQ_KILL_KEYS[e.key] && !e.shiftKey) {
+    toggleEqKill(activeDeck, EQ_KILL_KEYS[e.key]);
+    return;
+  }
+
   // Fullscreen mode navigation
   if (fullscreenMode) {
     if (e.key === 'ArrowDown' || e.key === 'j') {
@@ -164,7 +211,8 @@ window.addEventListener('keydown', e => {
       return;
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      loadHighlighted(e.shiftKey ? 'b' : 'a');
+      const targetDeck = e.shiftKey ? (activeDeck === 'a' ? 'b' : 'a') : activeDeck;
+      loadHighlighted(targetDeck);
       toggleFullscreen();
       return;
     } else if (e.key === 'Escape') {
@@ -185,9 +233,22 @@ window.addEventListener('keydown', e => {
     toggleFullscreen();
   }
 
-  // Normal mode: Detect Shift+B for fullscreen toggle
+  // Shift+A/B — sélectionner deck actif · Shift+L — toggle bibliothèque
+  if (e.shiftKey && (e.key === 'a' || e.key === 'A')) {
+    e.preventDefault();
+    applyMarkFilter(0);
+    setActiveDeck('a');
+    return;
+  }
   if (e.shiftKey && (e.key === 'b' || e.key === 'B')) {
     e.preventDefault();
+    applyMarkFilter(0);
+    setActiveDeck('b');
+    return;
+  }
+  if (e.shiftKey && (e.key === 'l' || e.key === 'L')) {
+    e.preventDefault();
+    applyMarkFilter(0);
     toggleFullscreen();
     return;
   }
@@ -195,13 +256,11 @@ window.addEventListener('keydown', e => {
   // Shift+1-5: filter library by mark color; Shift+0 = show all
   if (e.shiftKey && ['Digit0','Digit1','Digit2','Digit3','Digit4','Digit5'].includes(e.code)) {
     const marks = e.code === 'Digit0' ? 0 : parseInt(e.code.replace('Digit', ''));
-    document.querySelectorAll('.mark-filter-btn').forEach(b => b.classList.remove('active'));
+    applyMarkFilter(marks);
     if (marks !== 0) {
-      const btn = document.querySelector(`.mark-filter-btn[data-marks="${marks}"]`);
-      if (btn) btn.classList.add('active');
+      if (!fullscreenMode) toggleFullscreen();
+      highlightFirst();
     }
-    renderLibrary(document.getElementById('library-search').value,
-                  document.getElementById('contrib-filter').value, marks);
     return;
   }
 
@@ -223,16 +282,20 @@ window.addEventListener('keydown', e => {
     togglePlay('b');
   } else if (e.key === 'ArrowLeft') {
     e.preventDefault();
-    adjustXfader(-0.05);
+    adjustXfader(e.shiftKey ? -0.01 : -0.05);
   } else if (e.key === 'ArrowRight') {
     e.preventDefault();
-    adjustXfader(0.05);
-  } else if (e.key === ' ') { 
-    e.preventDefault(); 
-    if (deckA.playing || deckB.playing) { 
-      if(deckA.playing) togglePlay('a'); 
-      if(deckB.playing) togglePlay('b'); 
-    }
+    adjustXfader(e.shiftKey ? 0.01 : 0.05);
+  } else if (e.key === ' ') {
+    e.preventDefault();
+    togglePlay(activeDeck);
+  } else if (e.key === 'z') {
+    sync(activeDeck);
+  } else if (e.key === 'c' && !e.shiftKey) {
+    const deck = activeDeck === 'a' ? deckA : deckB;
+    deck.beatIndex = 0;
+  } else if (e.key === 'x') {
+    adjustXfader(0.5 - xfaderVal);
   }
 });
 
@@ -250,6 +313,18 @@ function setTweak(k, v) {
   applyTweaks(tweaks);
   try { window.parent.postMessage({type:'__edit_mode_set_keys', edits:{[k]:v}}, '*'); } catch(e){}
 }
+// Contrib in decks: click to open library filtered by contributor
+['a', 'b'].forEach(side => {
+  document.getElementById(`contrib-${side}`).addEventListener('click', () => {
+    const contrib = document.getElementById(`contrib-${side}`).textContent.trim();
+    if (!contrib || contrib === '—') return;
+    const sel = document.getElementById('contrib-filter');
+    sel.value = contrib;
+    renderLibrary(document.getElementById('library-search').value, contrib, markFilter);
+    if (!fullscreenMode) toggleFullscreen();
+  });
+});
+
 document.getElementById('tw-invert').addEventListener('click', () => setTweak('invertRig', !tweaks.invertRig));
 document.getElementById('tw-library').addEventListener('click', () => toggleFullscreen());
 document.getElementById('tw-session').addEventListener('input', e => setTweak('sessionName', e.target.value));
@@ -260,6 +335,30 @@ window.addEventListener('message', e => {
   else if (d.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('visible');
 });
 try { window.parent.postMessage({type:'__edit_mode_available'}, '*'); } catch(e){}
+
+// Easter egg: Shift+S · Shift+O · Shift+S → sos.musiqueapproximative.net
+const _SOS = ['S', 'O', 'S'];
+let _sosStep = 0, _sosTimer = null;
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (!e.shiftKey || (e.key !== 'S' && e.key !== 'O')) {
+    if (_sosStep > 0) { clearTimeout(_sosTimer); _sosStep = 0; }
+    return;
+  }
+  clearTimeout(_sosTimer);
+  if (e.key === _SOS[_sosStep]) {
+    _sosStep++;
+    if (_sosStep === _SOS.length) {
+      _sosStep = 0;
+      window.open('https://sos.musiqueapproximative.net', '_blank');
+    } else {
+      _sosTimer = setTimeout(() => { _sosStep = 0; }, 2000);
+    }
+  } else {
+    _sosStep = (e.key === _SOS[0]) ? 1 : 0;
+    if (_sosStep > 0) _sosTimer = setTimeout(() => { _sosStep = 0; }, 2000);
+  }
+});
 
 requestAnimationFrame(animate);
 initMidi();

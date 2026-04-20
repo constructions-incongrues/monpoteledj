@@ -48,17 +48,13 @@ function fmtDur(secs) {
   return m + ':' + String(secs % 60).padStart(2, '0');
 }
 
-self.onmessage = async ({ data: { url, trackIdx } }) => {
+// Receives already-decoded channel data from the main thread (no OfflineAudioContext needed)
+self.onmessage = ({ data: { trackIdx, channelData, sampleRate, duration } }) => {
   try {
-    const resp = await fetch(url);
-    const buf = await resp.arrayBuffer();
-    const ctx = new OfflineAudioContext(1, 1, 44100);
-    const decoded = await ctx.decodeAudioData(buf);
-    const ch = decoded.getChannelData(0);
-
-    const dur = fmtDur(Math.round(decoded.duration));
+    const ch = channelData;
+    const dur = fmtDur(Math.round(duration));
     const bpm = detectBpm(ch);
-    const key = detectKey(ch, decoded.sampleRate);
+    const key = detectKey(ch, sampleRate);
 
     // RMS waveform amplitudes (180 blocks)
     const n = 180;
