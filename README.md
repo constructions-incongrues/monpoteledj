@@ -24,25 +24,19 @@ This repository is configured for automatic merge with guardrails:
 - PRs labeled `do-not-merge` are explicitly excluded.
 - Merge method is `squash` to keep `main` history clean.
 
-Mandatory GitHub settings (repository settings):
-
-Quick setup with GitHub CLI:
-
-```bash
-bash scripts/configure-github-main-stability.sh constructions-incongrues musiqueapproximative-monpoteledj
-```
+Required GitHub settings (repository settings):
 
 1. Enable repository auto-merge in `Settings > General > Pull Requests`.
 2. Protect `main` in `Settings > Branches` (or Rulesets) with:
-	 - Require a pull request before merging.
-	 - Require approvals (recommended: at least 1).
-	 - Require status checks to pass before merging.
-	 - Required checks:
-		 - `Test Node 20`
-		 - `Test Node 22`
-		 - `Security audit`
-	 - Dismiss stale approvals when new commits are pushed.
-	 - Require conversation resolution before merge.
+   - Require a pull request before merging.
+   - Require at least 1 approval.
+   - Require status checks to pass before merging.
+   - Required checks:
+     - `Test Node 20`
+     - `Test Node 22`
+     - `Security audit`
+   - Dismiss stale approvals when new commits are pushed.
+   - Require conversation resolution before merge.
 
 With these settings, auto-merge cannot bypass checks or reviews, and `main` remains stable.
 
