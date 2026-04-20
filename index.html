@@ -1102,6 +1102,41 @@ body {
     margin-left: 12px;
     border-radius: 2px;
   }
+  #command-palette-open {
+    font-family: var(--ma-font-display);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1px solid var(--ma-white);
+    color: var(--ma-white);
+    padding: 3px 8px;
+    margin-left: 10px;
+    transition: var(--ma-transition);
+  }
+  #command-palette-open:hover {
+    background: var(--ma-white);
+    color: var(--ma-black);
+  }
+  #command-palette-hint {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    padding: 2px 7px;
+    border: 1px solid var(--ma-white);
+    font-family: var(--ma-font-display);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ma-white);
+    opacity: 0;
+    transform: translateY(-2px);
+    pointer-events: none;
+    transition: opacity 0.2s linear, transform 0.2s linear;
+  }
+  #command-palette-hint.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
   .flemme-mode #flemme-badge { display: inline-block; }
 </style>
 <link id="gfont-Arvo" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arvo:wght@300;400;500;600;700&amp;display=swap">
@@ -1139,9 +1174,12 @@ body {
     <kbd>1</kbd>&nbsp;<kbd>2</kbd>&nbsp;<kbd>3</kbd>&nbsp;— EQ kill &nbsp;·&nbsp;
     <kbd>←</kbd>&nbsp;<kbd>→</kbd>&nbsp;— xfader &nbsp;·&nbsp;
     <kbd>X</kbd>&nbsp;— centrer &nbsp;·&nbsp;
+    <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd>&nbsp;— commandes &nbsp;·&nbsp;
     <kbd>/</kbd>&nbsp;— chercher &nbsp;·&nbsp;
     <kbd>?</kbd>&nbsp;— aide
   </p>
+  <button id="command-palette-open" type="button" title="Palette de commandes (Cmd/Ctrl+K)">Commandes Ctrl/⌘K</button>
+  <span id="command-palette-hint" aria-hidden="true">Astuce: Ctrl/⌘K</span>
   <span id="flemme-badge">Mode F</span>
 
 </header>
@@ -1638,6 +1676,7 @@ body {
       <tr><td><kbd>←</kbd> / <kbd>→</kbd></td><td>Crossfader −5% / +5%</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd></td><td>Crossfader fin −1% / +1%</td></tr>
       <tr><td><kbd>X</kbd></td><td>Crossfader centré</td></tr>
+      <tr><td><kbd>⌘</kbd>+<kbd>K</kbd> / <kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Ouvrir la palette de commandes</td></tr>
       <tr><td><kbd>Espace</kbd></td><td>Play / pause — deck actif</td></tr>
       <tr><td><kbd>/</kbd></td><td>Recherche (puis <kbd>a</kbd>=artiste, <kbd>t</kbd>=titre, <kbd>c</kbd>=contrib)</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>L</kbd></td><td>Ouvrir / fermer bibliothèque</td></tr>

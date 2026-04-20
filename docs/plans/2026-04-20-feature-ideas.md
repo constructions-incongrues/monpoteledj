@@ -78,7 +78,7 @@ Liste des features proposées pour le DJ mixer. À creuser une par une.
 ### Features
 - [x] Favoris / Bookmarks de la librairie
 - [x] Fullscreen Library Search
-- [ ] Palette de commande
+- [x] Palette de commande
 - [ ] Dub Sirens
 - [ ] Mode F(lemme)
 - [ ] Enqueue in situ (à la Clementine)

@@ -100,10 +100,37 @@ function _executeCommand(idx) {
 function _openCommandPalette() {
   const dlg = document.getElementById('command-palette');
   const input = document.getElementById('command-palette-input');
+  if (!dlg || !input) return;
+  if (dlg.open) {
+    input.focus();
+    return;
+  }
+  _dismissCommandPaletteHint();
   input.value = '';
   _renderCommandPalette('');
-  dlg.showModal();
+  try {
+    dlg.showModal();
+  } catch {
+    return;
+  }
   input.focus();
+}
+
+function _dismissCommandPaletteHint() {
+  const hint = document.getElementById('command-palette-hint');
+  if (!hint) return;
+  hint.classList.remove('show');
+  try { sessionStorage.setItem('cmdPaletteHintSeen', '1'); } catch {}
+}
+
+function _showCommandPaletteHint() {
+  let seen = false;
+  try { seen = sessionStorage.getItem('cmdPaletteHintSeen') === '1'; } catch {}
+  if (seen) return;
+  const hint = document.getElementById('command-palette-hint');
+  if (!hint) return;
+  hint.classList.add('show');
+  setTimeout(() => _dismissCommandPaletteHint(), 4500);
 }
 
 wireXfader();
@@ -238,7 +265,7 @@ function _focusSearch(mode) {
 
 window.addEventListener('keydown', e => {
   // Cmd+K / Ctrl+K — open command palette
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+  if ((e.ctrlKey || e.metaKey) && (e.code === 'KeyK' || e.key.toLowerCase() === 'k')) {
     e.preventDefault();
     _openCommandPalette();
     return;
@@ -414,6 +441,10 @@ document.getElementById('command-palette-input')?.addEventListener('keydown', e 
 document.getElementById('command-palette')?.addEventListener('click', e => {
   if (e.target === e.currentTarget) e.currentTarget.close();
 });
+document.getElementById('command-palette-open')?.addEventListener('click', () => {
+  _openCommandPalette();
+});
+_showCommandPaletteHint();
 
 function applyTweaks(t) {
   document.body.classList.toggle('invert', !!t.invertRig);
