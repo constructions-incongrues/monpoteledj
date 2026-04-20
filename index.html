@@ -1138,6 +1138,81 @@ body {
     transform: translateY(0);
   }
   .flemme-mode #flemme-badge { display: inline-block; }
+
+  /* ================================================================
+     DESIGN OVERRIDES — hiérarchie visuelle renforcée
+     ================================================================ */
+
+  /* 1. ARTWORK — 150px, vraie présence */
+  .track-info .artwork-wrap { flex: 0 0 150px; }
+  .artwork { width: 150px; height: 150px; }
+
+  /* 2. WAVEFORM — plus haute, contraste passé/présent net */
+  .waveform { height: 130px; }
+  .wave-bars i.past { opacity: 0.12; }
+  .wave-playhead { width: 3px; }
+  /* ligne de référence centrale, presque invisible */
+  .waveform::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: 1px;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
+  }
+
+  /* 3. BPM — un readout, pas une étiquette */
+  .wave-header .stat.big { font-size: 38px; letter-spacing: -0.02em; line-height: 1; }
+
+  /* 4. TRACK TITLE — un peu plus de présence */
+  .track-info h2 { font-size: 20px; line-height: 1.05; }
+
+  /* 5. DECK ACTIVE — inset shadow, plus propre que outline */
+  .deck.deck-active { outline: none; box-shadow: inset 0 0 0 3px #fff; }
+
+  /* 6. PLAY BUTTON — respire quand actif */
+  #play-a.active, #play-b.active {
+    animation: play-breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes play-breathe {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.78; }
+  }
+
+  /* 7. LOOP BUTTONS — accent gauche quand actif */
+  .loop-buttons button.on { box-shadow: inset 3px 0 0 #666; }
+
+  /* 8. CHANNEL FADERS — plus hauts, plus de précision */
+  .channel .c-track { height: 190px; }
+  .channel .c-meter { height: 190px; }
+
+  /* 9. CROSSFADER — protagoniste : border fort, plus de hauteur */
+  .xfader-wrap {
+    margin-top: 16px;
+    padding: 20px 0 16px;
+    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
+  }
+  .xfader-track { height: 46px; }
+  .xfader-thumb { width: 14px; top: -5px; bottom: -5px; }
+
+  /* 10. LIBRARY — rangs alternés, densité aérée */
+  .library-table tbody td { padding: 10px 14px; }
+  .library-table tbody tr:nth-child(even) { background: #f9f9f9; }
+  .library-table tbody tr:nth-child(even):hover { background: #000; color: #fff; }
+  .library-table tbody tr:nth-child(even).highlight { background: #000; color: #fff; }
+  .library-head { padding: 16px 18px 14px; }
+  .library-head h3 { font-size: 16px; letter-spacing: 0.28em; }
+
+  /* 11. FULLSCREEN SEARCH — moment mémorable */
+  .library.fullscreen .library-head .search {
+    font-size: 24px; padding: 10px 16px;
+    font-family: var(--ma-font-display);
+    letter-spacing: 0.02em;
+  }
+
+  /* 12. MASTHEAD SHORTCUTS — lisibles, pas murmurés */
+  .masthead-shortcuts { font-size: 11px; color: var(--ma-gray-light); }
+  .masthead-shortcuts kbd { background: #444; }
+
 </style>
 <link id="gfont-Arvo" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arvo:wght@300;400;500;600;700&amp;display=swap">
 <script>
