@@ -16,11 +16,11 @@ Roadmap produit du DJ mixer, alignée avec les livraisons réelles sur `main`.
 
 ### 3. Fullscreen Library Search ✅
 - Affiche la librairie en fullscreen pour une recherche rapide
-- Raccourci: Shift+B (toggle), fleches ou j/k pour naviguer, Enter pour charger, Escape pour fermer
+- Raccourci: Shift+B (toggle), ↑/↓ (ArrowUp/ArrowDown) ou j/k pour naviguer, Enter pour charger, Escape pour fermer
 
 ### 4. Dub Sirens
 - Effets de sirene dub classiques (oscillateur + modulation)
-- Assignables a un deck ou au master
+- Assignables à un deck ou au master
 
 ### 5. Mode F(lemme) - 1 deck + autoplay ✅
 - Un seul deck visible
@@ -83,9 +83,9 @@ Roadmap produit du DJ mixer, alignée avec les livraisons réelles sur `main`.
 ## Priorisation
 
 ### Now (MVP)
-- #12 - Aligner la roadmap avec les livraisons reelles
+- #12 - Aligner la roadmap avec les livraisons réelles
 - #13 - Ajouter un lien GitHub visible dans l'interface
-- #14 - Refaire le README developpeur et utilisateur
+- #14 - Refaire le README développeur et utilisateur
 
 ### Next
 - #16 - Enqueue in situ dans la librairie
@@ -96,8 +96,8 @@ Roadmap produit du DJ mixer, alignée avec les livraisons réelles sur `main`.
 - #18 - EPIC Export de session (audio + setlist)
 - #19 - UX d'export session
 - #20 - Export audio WAV (MVP)
-- #21 - Export setlist horodatee
-- #22 - Discovery: evaluer l'usage de composants React
+- #21 - Export setlist horodatée
+- #22 - Discovery: évaluer l'usage de composants React
 - #23 - Discovery: cadrer l'item "Communication mi"
 
 ## Gouvernance backlog
