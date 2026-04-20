@@ -27,7 +27,7 @@
 - `adjustXfader(delta)` — relative crossfader move
 - `setXfaderVal(v)` — absolute crossfader (0–1)
 - `sync(deckId)` — sync pitch to other deck
-- `loadTrack(deckId, idx)` — load track by library index
+- `loadTrack(deckId, idx)` — load track by collections index
 - `deckA`, `deckB` — deck state objects; `deck.beatIndex`, `deck.hi.gain`, `deck.mid.gain`, `deck.lo.gain`
 
 ### DOM elements referenced by shortcuts

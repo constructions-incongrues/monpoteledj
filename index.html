@@ -1074,18 +1074,42 @@ body {
     background: var(--ma-black);
     border: 1px solid var(--ma-white);
     padding: 0;
-    width: min(500px, 90vw);
-    max-height: 400px;
+    width: min(640px, 92vw);
+    max-height: 75vh;
     overflow: hidden;
     font-family: var(--ma-font-body);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.45);
   }
   #command-palette::backdrop { background: rgba(0,0,0,0.75); }
+  .command-palette-top,
+  .command-palette-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: var(--ma-font-display);
+    text-transform: uppercase;
+  }
+  .command-palette-top {
+    letter-spacing: 0.16em;
+    font-size: 11px;
+  }
+  .command-palette-top .palette-title { color: var(--ma-white); }
+  .command-palette-top .palette-kbd,
+  .command-palette-foot .palette-hint {
+    color: var(--ma-gray-mid);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
   #command-palette-input {
     width: 100%;
     box-sizing: border-box;
-    padding: 12px 16px;
-    font-size: 15px;
-    font-family: var(--ma-font-body);
+    padding: 14px 16px;
+    font-size: 16px;
+    font-family: var(--ma-font-display);
+    letter-spacing: 0.03em;
     background: var(--ma-black);
     color: var(--ma-white);
     border: none;
@@ -1096,31 +1120,50 @@ body {
   #command-palette-list {
     list-style: none;
     margin: 0;
-    padding: 8px 0;
-    max-height: 320px;
+    padding: 8px 0 10px;
+    max-height: calc(75vh - 116px);
     overflow-y: auto;
   }
-  #command-palette-list li {
+  #command-palette-list li.section {
+    padding: 12px 16px 6px;
+    font-family: var(--ma-font-display);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ma-gray-mid);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 6px;
+  }
+  #command-palette-list li.section:first-child {
+    border-top: 0;
+    margin-top: 0;
+  }
+  #command-palette-list li.cmd-item {
     padding: 10px 16px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s linear, border-color 0.15s linear;
   }
-  #command-palette-list li:hover,
-  #command-palette-list li.selected { background: rgba(255,255,255,0.1); }
+  #command-palette-list li.cmd-item:hover,
+  #command-palette-list li.cmd-item.selected {
+    background: rgba(255,255,255,0.12);
+    border-left-color: var(--ma-white);
+  }
   #command-palette-list li .cmd-meta {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
     min-width: 0;
   }
   #command-palette-list li .cmd-name {
     color: var(--ma-white);
     font-family: var(--ma-font-display);
     font-size: 12px;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   #command-palette-list li .cmd-desc {
@@ -1128,19 +1171,23 @@ body {
     font-size: 11px;
     letter-spacing: 0.02em;
     line-height: 1.3;
+    max-width: 44ch;
   }
   #command-palette-list li .cmd-key {
-    font-family: var(--ma-font-display);
+    font-family: var(--ma-font-mono);
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ma-gray-mid);
+    color: var(--ma-white);
     white-space: nowrap;
+    border: 1px solid rgba(255,255,255,0.32);
+    padding: 4px 7px;
+    background: rgba(255,255,255,0.04);
   }
   #command-palette-list li.empty {
     cursor: default;
     display: block;
-    padding: 14px 16px;
+    padding: 18px 16px 14px;
   }
   #command-palette-list li.empty:hover,
   #command-palette-list li.empty.selected { background: transparent; }
@@ -1148,7 +1195,15 @@ body {
     display: block;
     margin-bottom: 4px;
   }
+  #command-palette-list li.section:hover,
+  #command-palette-list li.section.selected { background: transparent; }
   #command-palette-list li.hidden { display: none; }
+  .command-palette-foot {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 0;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
 
   /* Mode Flemme (single deck + autoplay) */
   .flemme-mode .deck[data-side="b"] { display: none; }
@@ -1442,7 +1497,7 @@ body {
   </div>
   <div class="item right">
     <span class="label">Mode</span>
-    <span class="value" id="status-mode">Normal</span>
+    <span class="value" id="status-mode">Cyber Tournetablisme</span>
   </div>
 </section>
 
@@ -1677,9 +1732,9 @@ body {
   <section class="playlists" id="playlists"></section>
 
   <!-- LIBRARY -->
-  <section class="library hidden" id="library" data-screen-label="Library">
+  <section class="library hidden" id="library" data-screen-label="Collections">
     <div class="library-head">
-      <h3>Bibliothèque</h3>
+      <h3>Collections</h3>
       <div class="crates"></div>
       <div class="smode-btns" id="search-modes">
         <button class="smode-btn active" data-mode="all" title="Recherche globale (/)">∗</button>
@@ -1687,7 +1742,7 @@ body {
         <button class="smode-btn" data-mode="title" title="Par titre (/t)">t</button>
         <button class="smode-btn" data-mode="contrib" title="Par contributeur (/c)">c</button>
       </div>
-      <input class="search" id="library-search" placeholder="Chercher…" type="search">
+      <input class="search" id="library-search" placeholder="Chercher dans les collections…" type="search">
       <div class="mark-filters" id="lib-mark-filters">
         <button class="mark-filter-btn" data-marks="-1" title="Tous les favoris">★</button>
         <kbd class="mark-shift-hint">Shift</kbd>
@@ -1923,8 +1978,16 @@ body {
 </div><!-- /.booth -->
 
 <dialog id="command-palette">
+  <div class="command-palette-top">
+    <span class="palette-title">Commandes</span>
+    <span class="palette-kbd">Contexte · Récentes · Fréquentes</span>
+  </div>
   <input type="text" id="command-palette-input" placeholder="Tapez une commande…" autocomplete="off">
   <ul id="command-palette-list"></ul>
+  <div class="command-palette-foot">
+    <span class="palette-hint">Entrée pour lancer</span>
+    <span class="palette-hint">↑ ↓ pour naviguer · Échap pour fermer</span>
+  </div>
 </dialog>
 
 <dialog id="shortcuts-help">
@@ -1945,14 +2008,14 @@ body {
       <tr><td><kbd>⌘</kbd>+<kbd>K</kbd> / <kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Ouvrir la palette de commandes</td></tr>
       <tr><td><kbd>Espace</kbd></td><td>Play / pause — deck actif</td></tr>
       <tr><td><kbd>/</kbd></td><td>Recherche (puis <kbd>a</kbd>=artiste, <kbd>t</kbd>=titre, <kbd>c</kbd>=contrib)</td></tr>
-      <tr><td><kbd>Shift</kbd>+<kbd>L</kbd></td><td>Ouvrir / fermer bibliothèque</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>L</kbd></td><td>Ouvrir / fermer collections</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>1</kbd>–<kbd>5</kbd></td><td>Filtrer par couleur de marque</td></tr>
       <tr><td><kbd>S</kbd></td><td>Marquer track (cycle 5 couleurs)</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>S</kbd></td><td>Retirer marque</td></tr>
-      <tr><td><kbd>↑</kbd> / <kbd>↓</kbd> / <kbd>j</kbd> / <kbd>k</kbd></td><td>Naviguer dans la bibliothèque</td></tr>
+      <tr><td><kbd>↑</kbd> / <kbd>↓</kbd> / <kbd>j</kbd> / <kbd>k</kbd></td><td>Naviguer dans les collections</td></tr>
       <tr><td><kbd>Enter</kbd></td><td>Charger track sur deck actif</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>Enter</kbd></td><td>Charger track sur l'autre deck</td></tr>
-      <tr><td><kbd>Escape</kbd></td><td>Fermer bibliothèque / quitter champ</td></tr>
+      <tr><td><kbd>Escape</kbd></td><td>Fermer les collections / quitter champ</td></tr>
       <tr><td><kbd>?</kbd></td><td>Cette aide</td></tr>
     </tbody>
   </table>
@@ -1985,7 +2048,7 @@ body {
     <div class="sw" id="tw-invert"></div>
   </div>
   <div class="tweak-row">
-    <span>Afficher la bibliothèque</span>
+    <span>Afficher les collections</span>
     <div class="sw" id="tw-library"></div>
   </div>
   <div class="tweak-row" style="flex-direction: column; align-items: stretch; gap: 6px;">
@@ -2010,7 +2073,7 @@ window.updateStatusBar = function(bpm, key, mode) {
   
   if (bpmEl) bpmEl.textContent = bpm ?? '—';
   if (keyEl) keyEl.textContent = key ?? '—';
-  if (modeEl) modeEl.textContent = mode ?? 'Normal';
+  if (modeEl) modeEl.textContent = mode ?? 'Cyber Tournetablisme';
 };
 </script>
 <script type="module" src="src/main.js"></script>

@@ -4,8 +4,8 @@ Liste des features proposées pour le DJ mixer. À creuser une par une.
 
 ## Features
 
-### 1. Favoris / Bookmarks de la librairie ✅
-- Marquer/unmarquer des fichiers de la librairie pour les retrouver facilement
+### 1. Favoris / Bookmarks des collections ✅
+- Marquer/unmarquer des fichiers des collections pour les retrouver facilement
 - Afficher les favoris dans un onglet dédié pendant la session
 - Permet un accès rapide aux tracks sans scroller la liste complète
 - **Contexte**: Utile quand on crée une mix, pour isoler les tracks à utiliser
@@ -22,9 +22,9 @@ Liste des features proposées pour le DJ mixer. À creuser une par une.
 - **Raccourci**: Cmd+K (ou Ctrl+K sur Windows/Linux)
 - Permet une navigation sans souris
 
-### 3. Fullscreen Library Search ✅
-- Affiche la librairie en fullscreen pour une recherche rapide
-- **Raccourci**: Shift+B (toggle), ↑/↓ ou j/k pour naviguer, Enter pour charger, Escape pour fermer
+### 3. Fullscreen Collections Search ✅
+- Affiche les collections en fullscreen pour une recherche rapide
+- **Raccourci**: Shift+L (toggle), ↑/↓ ou j/k pour naviguer, Enter pour charger, Escape pour fermer
 
 ### 4. Dub Sirens
 - Effets de sirène dub classiques (oscillateur + modulation)
@@ -36,7 +36,7 @@ Liste des features proposées pour le DJ mixer. À creuser une par une.
 - Idéal pour DJ sets passifs / soirées sans intervention
 
 ### 6. Enqueue in situ — à la Clementine
-- File d'attente visible dans la bibliothèque (indique l'ordre de passage)
+- File d'attente visible dans les collections (indique l'ordre de passage)
 - Drag-and-drop ou raccourci clavier pour ajouter une track à la queue
 - Le deck suivant charge automatiquement la prochaine en queue
 
@@ -76,8 +76,8 @@ Liste des features proposées pour le DJ mixer. À creuser une par une.
 ## Status
 
 ### Features
-- [x] Favoris / Bookmarks de la librairie
-- [x] Fullscreen Library Search
+- [x] Favoris / Bookmarks des collections
+- [x] Fullscreen Collections Search
 - [x] Palette de commande
 - [ ] Dub Sirens
 - [ ] Mode F(lemme)

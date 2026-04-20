@@ -10,7 +10,7 @@
 
 Le **Mode Flemme** (ou "Mode F") transforme le mixer en lecteur automatique :
 - Un seul deck visible (interface simplifiée)
-- Lecture automatique de la playlist (tracks marquées ou toute la librairie)
+- Lecture automatique de la playlist (tracks marquées ou toutes les collections)
 - Crossfade automatique entre morceaux
 - Idéal pour soirées sans intervention ou écoute en fond
 
@@ -82,7 +82,7 @@ export function enableFlemme() {
   document.body.classList.add('flemme-mode');
   document.getElementById('flemme-badge').style.display = 'block';
   
-  // Construire playlist: tracks marquées ou toute la librairie
+  // Construire playlist: tracks marquées ou toutes les collections
   flemmePlaylist = LIBRARY
     .map((t, i) => ({ track: t, idx: i }))
     .filter(({ track }) => track.marks > 0 || markFilter === 0)
