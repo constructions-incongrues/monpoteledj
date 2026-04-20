@@ -197,6 +197,10 @@ export function loadTrack(deckId, trackIdx) {
   document.getElementById(`artist-${deckId}`).textContent = track.artist;
   document.getElementById(`title-${deckId}`).textContent = track.title;
   document.getElementById(`contrib-${deckId}`).textContent = track.contrib;
+  const bodyEl = document.getElementById(`track-body-${deckId}`);
+  if (bodyEl) bodyEl.textContent = track.body || '';
+  const linkEl = document.getElementById(`post-link-${deckId}`);
+  if (linkEl) { linkEl.href = track.postUrl || '#'; linkEl.hidden = !track.postUrl; }
   document.getElementById(`bpm-${deckId}`).textContent = track.bpm ?? '—';
   document.getElementById(`key-${deckId}`).textContent = track.key || '—';
   deck.url = track.url;

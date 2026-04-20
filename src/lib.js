@@ -33,6 +33,8 @@ export function mapPost(p) {
     mood:            '',
     url:             (p.track && p.track.href) ? p.track.href.replace(/\+/g, '%20') : null,
     slug:            p.id || null,
+    postUrl:         p.id ? `https://www.musiqueapproximative.net/posts/${p.id}` : null,
+    body:            (p.body && p.body.html) || (p.body && p.body.markdown) || '',
     buyUrl:          p.buy_url || '',
     mark:            0,   // 0 = none, 1-5 = colored bookmark
   };

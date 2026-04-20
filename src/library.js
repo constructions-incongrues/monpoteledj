@@ -164,6 +164,60 @@ export function renderPlaylists() {
   }
 }
 
+export function renderFlemmePlaylist(trackIndices, currentIdx = 0) {
+  const container = document.getElementById('playlists');
+  if (!container) return;
+  container.innerHTML = '';
+  const section = document.createElement('div');
+  section.className = 'playlist flemme-playlist';
+
+  const table = document.createElement('table');
+  table.className = 'playlist-table';
+  const tbody = document.createElement('tbody');
+
+  trackIndices.forEach((i, pos) => {
+    const t = LIBRARY[i];
+    if (!t) return;
+
+    const row = document.createElement('tr');
+    row.dataset.idx = String(i);
+    row.dataset.pos = String(pos);
+    if (pos === currentIdx) row.classList.add('flemme-current');
+
+    const artistCell = document.createElement('td');
+    artistCell.className = 'artist';
+    artistCell.textContent = t.artist || '—';
+
+    const titleCell = document.createElement('td');
+    titleCell.className = 'title';
+    titleCell.textContent = t.title || '—';
+
+    const contribCell = document.createElement('td');
+    contribCell.className = 'contrib';
+    contribCell.dataset.contrib = t.contrib || '';
+    contribCell.textContent = t.contrib || '—';
+
+    row.append(artistCell, titleCell, contribCell);
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  section.appendChild(table);
+  container.appendChild(section);
+}
+
+export function updateFlemmeHighlight(pos) {
+  const rows = document.querySelectorAll('.flemme-playlist tr');
+  rows.forEach((r, i) => r.classList.toggle('flemme-current', i === pos));
+  rows[pos]?.scrollIntoView({ block: 'nearest' });
+}
+
+export function updateFlemmeNav(pos) {
+  const rows = document.querySelectorAll('.flemme-playlist tr');
+  rows.forEach((r, i) => r.classList.toggle('flemme-focused', i === pos));
+  rows[pos]?.scrollIntoView({ block: 'nearest' });
+}
+
 export function populateContribFilter() {
   const sel = document.getElementById('contrib-filter');
   if (!sel) return;

@@ -1,6 +1,6 @@
 import { deckA, deckB } from './audio.js';
-import { fetchLibrary, LIBRARY, renderLibrary, renderPlaylists, populateContribFilter, cycleMark, unmarkTrack, markFilter, setSearchMode } from './library.js';
-import { toggleFlemme } from './flemme.js';
+import { fetchLibrary, LIBRARY, renderLibrary, renderPlaylists, populateContribFilter, cycleMark, unmarkTrack, markFilter, setSearchMode, updateFlemmeHighlight } from './library.js';
+import { toggleFlemme, flemmeMode, flemmePlaylist, flemmeIndex, setFlemmeIndex, navigateFlemme, loadFlemmeHighlighted } from './flemme.js';
 import { applyCrossfader, adjustXfader, wireXfader, wireChannelFader, wireEq, wirePitch,
          loadTrack, togglePlay, sync, animate, wireWaveSeek,
          toggleFullscreen, navigateHighlight, loadHighlighted, highlightFirst, fullscreenMode, highlightedIdx,
@@ -188,7 +188,19 @@ document.getElementById('library-body').addEventListener('click', e => {
 
 document.getElementById('playlists').addEventListener('click', e => {
   const b = e.target.closest('[data-load]');
-  if (b) { loadTrack(b.dataset.load, parseInt(b.dataset.idx)); e.stopPropagation(); }
+  if (b) { loadTrack(b.dataset.load, parseInt(b.dataset.idx)); e.stopPropagation(); return; }
+  // Flemme playlist: click row to load + play on deck A
+  if (flemmeMode) {
+    const row = e.target.closest('tr[data-pos]');
+    if (row && !e.target.closest('td[data-contrib]')) {
+      const pos = parseInt(row.dataset.pos);
+      const idx = parseInt(row.dataset.idx);
+      setFlemmeIndex(pos);
+      loadTrack('a', idx);
+      updateFlemmeHighlight(pos);
+      setTimeout(() => { if (deckA.audio && deckA.audio.paused) togglePlay('a'); }, 100);
+    }
+  }
 });
 
 document.getElementById('library-body').addEventListener('dblclick', e => {
@@ -314,6 +326,17 @@ window.addEventListener('keydown', e => {
     return;
   }
 
+  // Flemme mode navigation
+  if (flemmeMode) {
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      e.preventDefault(); navigateFlemme(1); return;
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
+      e.preventDefault(); navigateFlemme(-1); return;
+    } else if (e.key === 'Enter') {
+      e.preventDefault(); loadFlemmeHighlighted(); return;
+    }
+  }
+
   // Fullscreen mode navigation
   if (fullscreenMode) {
     if (e.key === 'ArrowDown' || e.key === 'j') {
@@ -423,6 +446,13 @@ window.addEventListener('keydown', e => {
 });
 
 // Shortcuts help dialog handlers
+document.getElementById('shortcuts-help-open')?.addEventListener('click', () => {
+  const dialog = document.getElementById('shortcuts-help');
+  if (dialog && !dialog.open) dialog.showModal();
+});
+document.getElementById('mode-toggle-btn')?.addEventListener('click', () => {
+  toggleFlemme();
+});
 document.getElementById('shortcuts-close')?.addEventListener('click', () =>
   document.getElementById('shortcuts-help').close());
 document.getElementById('shortcuts-help')?.addEventListener('click', e => {

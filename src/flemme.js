@@ -2,13 +2,32 @@
 // Mode Flemme — single deck + autoplay
 // ─────────────────────────────────────────────────────────────────────────────
 import { deckA, ac } from './audio.js';
-import { LIBRARY, markFilter } from './library.js';
+import { LIBRARY, markFilter, renderFlemmePlaylist, updateFlemmeHighlight, updateFlemmeNav } from './library.js';
 import { loadTrack, togglePlay } from './mixer.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 export let flemmeMode = false;
 export let flemmePlaylist = [];  // indices of tracks to play
 export let flemmeIndex = 0;
+export let flemmeHighlight = 0;
+export function setFlemmeIndex(i) { flemmeIndex = i; }
+
+export function navigateFlemme(dir) {
+  if (!flemmeMode || flemmePlaylist.length === 0) return;
+  flemmeHighlight = (flemmeHighlight + dir + flemmePlaylist.length) % flemmePlaylist.length;
+  updateFlemmeNav(flemmeHighlight);
+}
+
+export function loadFlemmeHighlighted() {
+  if (!flemmeMode || flemmePlaylist.length === 0) return;
+  flemmeIndex = flemmeHighlight;
+  const idx = flemmePlaylist[flemmeHighlight];
+  loadTrack('a', idx);
+  updateFlemmeHighlight(flemmeHighlight);
+  setTimeout(() => {
+    if (deckA.audio && deckA.audio.paused) togglePlay('a');
+  }, 100);
+}
 
 let _scheduleTimer = null;
 const CROSSFADE_LEAD = 6; // seconds before end to start fade
@@ -18,25 +37,24 @@ export function enableFlemme() {
   flemmeMode = true;
   document.body.classList.add('flemme-mode');
 
-  // Build playlist: marked tracks if filter active, else all tracks with marks > 0, else all
+  // Build playlist: tracks marked 1, fallback to 50 random
   flemmePlaylist = LIBRARY
-    .map((t, i) => ({ track: t, idx: i }))
-    .filter(({ track }) => {
-      if (markFilter > 0) return track.marks === markFilter;
-      if (markFilter === -1) return track.marks > 0;
-      return track.marks > 0; // default: all marked
-    })
-    .map(({ idx }) => idx);
+    .map((t, i) => ({ t, i }))
+    .filter(({ t }) => Number(t.mark ?? 0) === 1)
+    .map(({ i }) => i);
 
-  // Fallback: if no marked tracks, use entire library
   if (flemmePlaylist.length === 0) {
-    flemmePlaylist = LIBRARY.map((_, i) => i);
+    const all = LIBRARY.map((_, i) => i);
+    _shuffle(all);
+    flemmePlaylist = all.slice(0, 50);
   }
 
-  // Shuffle playlist for variety
-  _shuffle(flemmePlaylist);
-
   flemmeIndex = 0;
+  flemmeHighlight = 0;
+
+  // Render playlist panel
+  renderFlemmePlaylist(flemmePlaylist, 0);
+  updateFlemmeNav(0);
 
   // Load and play first track
   const firstIdx = flemmePlaylist[0];
@@ -95,10 +113,23 @@ function _scheduleNext() {
 function _playNext() {
   if (!flemmeMode) return;
 
-  flemmeIndex = (flemmeIndex + 1) % flemmePlaylist.length;
-  const nextIdx = flemmePlaylist[flemmeIndex];
+  const nextPos = flemmeIndex + 1;
 
-  console.log('[flemme] Playing next:', nextIdx, LIBRARY[nextIdx]?.title);
+  // End of playlist → reload with 50 new random tracks
+  if (nextPos >= flemmePlaylist.length) {
+    const all = LIBRARY.map((_, i) => i);
+    _shuffle(all);
+    flemmePlaylist = all.slice(0, 50);
+    flemmeIndex = 0;
+    flemmeHighlight = 0;
+    renderFlemmePlaylist(flemmePlaylist, 0);
+    updateFlemmeNav(0);
+  } else {
+    flemmeIndex = nextPos;
+  }
+
+  const nextIdx = flemmePlaylist[flemmeIndex];
+  updateFlemmeHighlight(flemmeIndex);
 
   // Fade out current
   const currentGain = deckA.gain.gain;
