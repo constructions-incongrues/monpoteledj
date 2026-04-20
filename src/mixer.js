@@ -39,6 +39,30 @@ export let xfaderVal = 0.5;
 export let fullscreenMode = false;
 export let highlightedIdx = -1;
 
+function setPlayButtonVisualState(btn, isPlaying) {
+  const triangle = btn.querySelector('.tri');
+  if (isPlaying) {
+    triangle.style.border = '0';
+    triangle.style.borderLeft = '';
+    triangle.style.borderTop = '';
+    triangle.style.borderBottom = '';
+    triangle.style.width = '8px';
+    triangle.style.height = '8px';
+    triangle.style.background = 'currentColor';
+    btn.querySelector('span:last-child').textContent = 'Pause';
+    return;
+  }
+
+  triangle.style.width = '';
+  triangle.style.height = '';
+  triangle.style.background = '';
+  triangle.style.border = '';
+  triangle.style.borderLeft = '7px solid currentColor';
+  triangle.style.borderTop = '5px solid transparent';
+  triangle.style.borderBottom = '5px solid transparent';
+  btn.querySelector('span:last-child').textContent = 'Play';
+}
+
 export function applyCrossfader() {
   const a = Math.cos(xfaderVal * Math.PI/2);
   const b = Math.sin(xfaderVal * Math.PI/2);
@@ -195,10 +219,7 @@ export async function togglePlay(deckId) {
   if (deck.playing) {
     stopDeck(deck);
     btn.classList.remove('active');
-    btn.querySelector('.tri').style.borderLeft = '7px solid currentColor';
-    btn.querySelector('.tri').style.borderTop = '5px solid transparent';
-    btn.querySelector('.tri').style.borderBottom = '5px solid transparent';
-    btn.querySelector('span:last-child').textContent = 'Play';
+    setPlayButtonVisualState(btn, false);
     document.getElementById(`art-${deckId}`).classList.add('idle');
   } else {
     deck.playing = true;
@@ -208,17 +229,12 @@ export async function togglePlay(deckId) {
         console.warn('Play blocked:', e);
         deck.playing = false;
         btn.classList.remove('active');
-        btn.querySelector('.tri').style.borderLeft = '7px solid currentColor';
-        btn.querySelector('.tri').style.borderTop = '5px solid transparent';
-        btn.querySelector('.tri').style.borderBottom = '5px solid transparent';
-        btn.querySelector('span:last-child').textContent = 'Play';
+        setPlayButtonVisualState(btn, false);
         document.getElementById(`art-${deckId}`).classList.add('idle');
       });
     }
     btn.classList.add('active');
-    const t = btn.querySelector('.tri');
-    t.style.border = '0'; t.style.width = '8px'; t.style.height = '8px'; t.style.background = 'currentColor';
-    btn.querySelector('span:last-child').textContent = 'Pause';
+    setPlayButtonVisualState(btn, true);
     document.getElementById(`art-${deckId}`).classList.remove('idle');
   }
 }

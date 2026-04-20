@@ -66,7 +66,10 @@ export function detectBpm(audioBuffer) {
             console.error('[lib.detectBpm] ❌ Timeout: MusicTempo never loaded after 5s', {
               windowMusicTempo: globalThis?.MusicTempo,
               globalMusicTempo: globalThis.MusicTempo,
-              loadFlags: { mt: window?.MUSIC_TEMPO_LOADED, meyda: window?.MEYDA_LOADED }
+              loadFlags: {
+                mt: globalThis?.MUSIC_TEMPO_LOADED,
+                meyda: globalThis?.MEYDA_LOADED
+              }
             });
             resolve(null);
           }
