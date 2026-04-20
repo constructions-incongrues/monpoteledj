@@ -1,0 +1,234 @@
+/* =========================================================
+   MUSIQUE APPROXIMATIVE — COLORS & TYPE
+   A high-contrast black/white system for mélomanes fêlé⋅e⋅s
+   ========================================================= */
+
+/* ---- Webfonts (Google Fonts) ---- */
+@import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Rambla:wght@400;700&display=swap');
+
+:root {
+  /* -------- COLORS : foundations -------- */
+  --ma-black:       #000000;    /* the absolute. backgrounds, headers, capsules */
+  --ma-white:       #ffffff;    /* the absolute, inverted. content bg, text */
+
+  /* Grays — only 3 of them, used sparingly */
+  --ma-gray-light:  #bbbbbb;    /* contributor links, dim text on black */
+  --ma-gray-mid:    #aaaaaa;    /* player seek-bar base, disabled/inactive */
+  --ma-gray-dark:   #555555;    /* article h2, muted text on white */
+  --ma-gray-ink:    #555050;    /* article link default on white — slightly warm */
+
+  /* -------- SEMANTIC : foreground / background -------- */
+  /* "Stage on white" — article bodies, content-text */
+  --ma-bg:          var(--ma-white);
+  --ma-fg:          var(--ma-black);
+  --ma-fg-muted:    var(--ma-gray-dark);
+  --ma-fg-subtle:   var(--ma-gray-ink);
+
+  /* "Stage on black" — headers, contributor footer, capsules */
+  --ma-bg-inverse:  var(--ma-black);
+  --ma-fg-inverse:  var(--ma-white);
+  --ma-fg-inverse-muted: var(--ma-gray-light);
+
+  /* Player / controls */
+  --ma-rail:        var(--ma-gray-mid);   /* seek + volume rail bg */
+  --ma-rail-fill:   var(--ma-black);       /* played / filled portion */
+
+  /* Selection — always inverts whatever surface you're on */
+  --ma-select-bg-on-white: var(--ma-black);
+  --ma-select-fg-on-white: var(--ma-white);
+  --ma-select-bg-on-black: var(--ma-white);
+  --ma-select-fg-on-black: var(--ma-black);
+
+  /* -------- TYPE : families -------- */
+  --ma-font-display: "Arvo", "Courier New", serif;      /* slab-serif, geometric, posters */
+  --ma-font-body:    "Rambla", "Helvetica Neue", Arial, sans-serif; /* humanist sans */
+  --ma-font-mono:    "Courier New", ui-monospace, monospace;
+
+  /* -------- TYPE : scale (ported from rem-based 62.5% root) -------- */
+  --ma-text-xs:     1.0rem;  /* 10px  — footer h2, all-tracks list items */
+  --ma-text-sm:     1.1rem;  /* 11px  — header nav "PARCOURIR", uppercase */
+  --ma-text-md:     1.2rem;  /* 12px  — descriptif, pitch value */
+  --ma-text-base:   1.3rem;  /* 13px  — contributor section title, controls */
+  --ma-text-lg:     2rem;    /* 20px  — mobile title */
+  --ma-text-xl:     2.5rem;  /* 25px  — small-screen title */
+  --ma-text-2xl:    3rem;    /* 30px  — small laptop title */
+  --ma-text-3xl:    3.5rem;  /* 35px  — article h2 default, section titles */
+  --ma-text-4xl:    4rem;    /* 40px  — article h1 (track author) */
+  --ma-text-5xl:    4.9rem;  /* 49px  — wide-screen title */
+
+  /* -------- TYPE : weights -------- */
+  --ma-weight-regular: 400;
+  --ma-weight-bold:    700;
+
+  /* -------- TYPE : transforms -------- */
+  --ma-caps:        uppercase;
+
+  /* -------- SPACING (loose, as used in layout) -------- */
+  --ma-space-1:  5px;
+  --ma-space-2:  10px;
+  --ma-space-3:  15px;
+  --ma-space-4:  20px;
+  --ma-space-5:  30px;
+  --ma-space-6:  40px;
+
+  /* -------- MISC -------- */
+  --ma-border-hair:   1px solid var(--ma-black);
+  --ma-radius-none:   0;        /* nothing is rounded. it's a principle. */
+
+  /* Transitions — jPlayer default: linear, 0.15s, for bg/color/opacity */
+  --ma-transition:    background-color 0.15s linear, color 0.15s linear, opacity 0.15s linear;
+}
+
+/* =========================================================
+   BASE / ROOT
+   ========================================================= */
+
+/* html font-size: 62.5% base — makes 1rem = 10px (legacy-but-working trick) */
+html { font-size: 62.5%; }
+
+body {
+  background-color: var(--ma-bg-inverse);
+  color: var(--ma-fg-inverse);
+  font-family: var(--ma-font-body);
+  font-size: var(--ma-text-base);
+  line-height: 1.4;
+}
+
+/* =========================================================
+   SEMANTIC TYPE : how it's used in the product
+   ========================================================= */
+
+/* h1 — track / article title. Arvo, black on white, centered. */
+.ma-h1, article h1 {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-4xl);
+  font-weight: var(--ma-weight-bold);
+  color: var(--ma-fg);
+  background: var(--ma-bg);
+  text-align: center;
+  padding: var(--ma-space-4) 0 var(--ma-space-2) 0;
+  line-height: 1.1;
+}
+
+/* h2 — track title / subtitle. Arvo, warm-gray on white. */
+.ma-h2, article h2 {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-3xl);
+  color: var(--ma-fg-muted);
+  background: var(--ma-bg);
+  text-align: center;
+}
+
+/* Big masthead title — "MUSIQUE APPROXIMATIVE" in black capsule */
+.ma-title {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-5xl);
+  color: var(--ma-fg-inverse);
+  background: var(--ma-bg-inverse);
+  text-align: center;
+  padding: var(--ma-space-4) 0;
+  line-height: 1;
+}
+
+/* Body paragraph — white background, centered, intimate line-length */
+.ma-p, article p {
+  font-family: var(--ma-font-body);
+  font-size: var(--ma-text-base);
+  color: var(--ma-fg);
+  text-align: center;
+  padding: var(--ma-space-4) 0;
+}
+
+/* Small UPPERCASE header line — "PARCOURIR : TOUS LES MORCEAUX" */
+.ma-caps-sm, header p {
+  font-family: var(--ma-font-body);
+  font-size: var(--ma-text-sm);
+  text-transform: var(--ma-caps);
+  color: var(--ma-fg-inverse);
+  background: var(--ma-bg-inverse);
+  padding: var(--ma-space-1) 0 0 0;
+  line-height: 1.3;
+}
+
+/* Contributor / footer headings — small white on black */
+.ma-h-footer {
+  font-family: var(--ma-font-display);
+  font-size: var(--ma-text-xs);
+  color: var(--ma-fg-inverse);
+  padding: var(--ma-space-2) 0;
+}
+
+/* About-text body (footer) — justified, Rambla, light gray */
+.ma-about-p {
+  font-family: var(--ma-font-body);
+  color: var(--ma-fg-inverse-muted);
+  text-align: justify;
+  line-height: 1.5;
+}
+
+/* Code / technical */
+.ma-code {
+  font-family: var(--ma-font-mono);
+  font-size: var(--ma-text-md);
+  background: var(--ma-bg);
+  color: var(--ma-fg);
+  padding: 0 4px;
+}
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+/* Link on white (article body) — warm muted gray; hovers to pure black */
+.ma-link-light {
+  color: var(--ma-fg-subtle);
+  text-decoration: none;
+}
+.ma-link-light:hover { color: var(--ma-fg); }
+
+/* Link on black (contributors) — light gray; hovers INVERT (white bg, black fg) */
+.ma-link-dark {
+  color: var(--ma-fg-inverse-muted);
+  background: var(--ma-bg-inverse);
+  text-decoration: none;
+}
+.ma-link-dark:hover {
+  color: var(--ma-fg);
+  background: var(--ma-bg);
+  text-decoration: none;
+}
+
+/* Underlined About-style link */
+.ma-link-about {
+  color: var(--ma-fg-inverse-muted);
+  text-decoration: underline;
+  background-color: var(--ma-bg-inverse);
+}
+.ma-link-about:hover {
+  color: var(--ma-fg-inverse);
+  text-decoration: underline;
+}
+
+/* =========================================================
+   TEXT SELECTION : always inverts the surface
+   ========================================================= */
+::selection {
+  background-color: var(--ma-select-bg-on-white);
+  color: var(--ma-select-fg-on-white);
+}
+.ma-on-black ::selection {
+  background-color: var(--ma-select-bg-on-black);
+  color: var(--ma-select-fg-on-black);
+}
+
+/* =========================================================
+   RESPONSIVE TITLE — stepped-down size brackets
+   (preserved exactly from production CSS)
+   ========================================================= */
+@media (max-width: 1050px) { .ma-title { font-size: var(--ma-text-3xl); } }
+@media (max-width: 800px)  { .ma-title { font-size: var(--ma-text-3xl); } }
+@media (max-width: 720px)  { .ma-title { font-size: var(--ma-text-2xl); } }
+@media (max-width: 630px)  { .ma-title { font-size: var(--ma-text-xl);  } }
+@media (max-width: 530px)  { .ma-title { font-size: var(--ma-text-lg);  } }
+@media (max-width: 430px)  { .ma-title { font-size: 1.5rem; } }
+@media (max-width: 370px)  { .ma-title { font-size: 1.2rem; } }
