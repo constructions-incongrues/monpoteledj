@@ -10,6 +10,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -24,6 +27,7 @@ jobs:
         node:
           - '20'
           - '22'
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +43,7 @@ jobs:
   audit:
     name: Security audit
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -48,4 +53,4 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm audit --audit-level=high || true
+      - run: npm audit --audit-level=high
