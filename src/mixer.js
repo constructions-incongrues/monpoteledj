@@ -351,7 +351,10 @@ export function wireWaveSeek(id, deck) {
   waveform.addEventListener('click', e => {
     if (!deck.track) return;
     const r = waveform.getBoundingClientRect();
-    const frac = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    if (!Number.isFinite(r.width) || r.width <= 0) return;
+    const rawFrac = (e.clientX - r.left) / r.width;
+    if (!Number.isFinite(rawFrac)) return;
+    const frac = Math.max(0, Math.min(1, rawFrac));
     if (deck.audio && deck.audio.duration > 0) {
       deck.audio.currentTime = frac * deck.audio.duration;
     } else {
