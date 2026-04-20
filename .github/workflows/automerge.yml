@@ -52,14 +52,12 @@ jobs:
               const result = await github.graphql(
                 `query($owner: String!, $repo: String!, $number: Int!) {
                   repository(owner: $owner, name: $repo) {
-                    pullRequest(number: $number) {
-                      id
-                      autoMergeRequest {
-                        enabledAt
-                      }
-                    }
+                  pullRequest(number: $number) {
+                    id
+                    autoMergeRequest { id }
                   }
-                }`,
+                }
+              }`,
                 { owner, repo, number: prNumber }
               );
 
@@ -69,10 +67,13 @@ jobs:
                 return;
               }
 
-              if (!pullRequest?.autoMergeRequest) {
+              if (!pullRequest.autoMergeRequest) {
                 core.info('No active auto-merge request found.');
                 return;
               }
+              core.info(
+                `Disabling auto-merge request ${pullRequest.autoMergeRequest.id} for PR #${prNumber}.`
+              );
 
               await github.graphql(
                 `mutation($pullRequestId: ID!) {
