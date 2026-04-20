@@ -56,7 +56,6 @@ export function detectBpm(audioBuffer) {
               const chData = audioBuffer.getChannelData(0);
               const tempo = new MT(chData).tempo;
               const bpm = Math.round(tempo);
-              console.log('[lib.detectBpm] ✅ Success (delayed):', { bpm, tempo, bufferLength: audioBuffer.length, retries });
               resolve(bpm);
             } catch (e) {
               console.error('[lib.detectBpm] ❌ Failed after library loaded:', e.message);
@@ -65,9 +64,12 @@ export function detectBpm(audioBuffer) {
           } else if (retries >= maxRetries) {
             clearInterval(check);
             console.error('[lib.detectBpm] ❌ Timeout: MusicTempo never loaded after 5s', {
-              windowMusicTempo: window?.MusicTempo,
+              windowMusicTempo: globalThis?.MusicTempo,
               globalMusicTempo: globalThis.MusicTempo,
-              loadFlags: { mt: window?.MUSIC_TEMPO_LOADED, meyda: window?.MEYDA_LOADED }
+              loadFlags: {
+                mt: globalThis?.MUSIC_TEMPO_LOADED,
+                meyda: globalThis?.MEYDA_LOADED
+              }
             });
             resolve(null);
           }
@@ -78,17 +80,10 @@ export function detectBpm(audioBuffer) {
       console.warn('[lib.detectBpm] Invalid audioBuffer', { length: audioBuffer?.length });
       return null;
     }
-    console.log('[lib.detectBpm] Calling MusicTempo with:', { 
-      MusicTempoType: typeof MusicTempo,
-      audioBufferType: audioBuffer.constructor.name,
-      audioBufferLength: audioBuffer.length,
-      audioBufferSampleRate: audioBuffer.sampleRate
-    });
     // MusicTempo expects raw audio samples (array), not AudioBuffer
     const channelData = audioBuffer.getChannelData(0);
     const tempo = new MusicTempo(channelData).tempo;
     const bpm = Math.round(tempo);
-    console.log('[lib.detectBpm] ✅ Success (immediate):', { bpm, tempo, bufferLength: audioBuffer.length });
     return bpm;
   } catch(e) {
     console.error('[lib.detectBpm] ❌ Exception:', { error: e, message: e?.message, toString: String(e) }, { bufferLength: audioBuffer?.length });

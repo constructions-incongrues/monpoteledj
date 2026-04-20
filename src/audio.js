@@ -70,8 +70,7 @@ export function scheduleDeck(deck) {
 
   if (deck.audio) {
     deck.audio.playbackRate = 1 + deck.pitch / 100;
-    deck.audio.play().catch(e => console.warn('Audio play blocked:', e));
-    return;
+    return deck.audio.play();
   }
 
   if (deck.schedInterval) clearInterval(deck.schedInterval);
