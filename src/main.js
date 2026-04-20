@@ -1,6 +1,6 @@
 import { deckA, deckB } from './audio.js';
 import { fetchLibrary, LIBRARY, renderLibrary, renderPlaylists, populateContribFilter, cycleMark, unmarkTrack, markFilter, setSearchMode } from './library.js';
-import { flemmeMode, toggleFlemme, onTrackEnded } from './flemme.js';
+import { flemmeMode, toggleFlemme } from './flemme.js';
 import { applyCrossfader, adjustXfader, wireXfader, wireChannelFader, wireEq, wirePitch,
          loadTrack, togglePlay, sync, animate,
          toggleFullscreen, navigateHighlight, loadHighlighted, highlightFirst, fullscreenMode, highlightedIdx,
@@ -42,7 +42,12 @@ const COMMANDS = [
   { id: 'play-active', name: 'Play / Pause deck actif',  key: 'Espace',     action: () => togglePlay(activeDeck) },
   { id: 'sync-active', name: 'Sync tempo',               key: 'Z',          action: () => sync(activeDeck) },
   { id: 'cue-active',  name: 'Cue (retour début)',       key: 'C',          action: () => { (activeDeck === 'a' ? deckA : deckB).beatIndex = 0; } },
-  { id: 'next-active', name: 'Morceau suivant',          key: 'V',          action: () => { const dk = activeDeck === 'a' ? deckA : deckB; const i = dk.track ? LIBRARY.indexOf(dk.track) : -1; loadTrack(activeDeck, (i + 1) % LIBRARY.length); } },
+  { id: 'next-active', name: 'Morceau suivant',          key: 'V',          action: () => {
+    if (LIBRARY.length === 0) return;
+    const dk = activeDeck === 'a' ? deckA : deckB;
+    const i = dk.track ? LIBRARY.indexOf(dk.track) : -1;
+    loadTrack(activeDeck, (i + 1) % LIBRARY.length);
+  } },
   { id: 'select-a',    name: 'Sélectionner Deck A',      key: 'Shift+A',    action: () => setActiveDeck('a') },
   { id: 'select-b',    name: 'Sélectionner Deck B',      key: 'Shift+B',    action: () => setActiveDeck('b') },
   { id: 'flemme',      name: 'Mode Flemme (autoplay)',   key: 'F',          action: () => toggleFlemme() },
@@ -406,7 +411,17 @@ document.getElementById('command-palette-input')?.addEventListener('input', e =>
 document.getElementById('command-palette-input')?.addEventListener('keydown', e => {
   if (e.key === 'ArrowDown') { e.preventDefault(); _navigateCommandPalette(1); }
   else if (e.key === 'ArrowUp') { e.preventDefault(); _navigateCommandPalette(-1); }
-  else if (e.key === 'Enter') { e.preventDefault(); _executeCommand(_cmdSelectedIdx); }
+  else if (e.key === 'Enter') {
+    e.preventDefault();
+    const commandPalette = document.getElementById('command-palette');
+    const hasVisibleCommand = !!commandPalette &&
+      Array.from(commandPalette.querySelectorAll('button, [role="option"], li'))
+        .some(el => !el.hidden && el.offsetParent !== null && !el.disabled);
+    if (Number.isInteger(_cmdSelectedIdx) && _cmdSelectedIdx >= 0 &&
+        hasVisibleCommand) {
+      _executeCommand(_cmdSelectedIdx);
+    }
+  }
   else if (e.key === 'Escape') { document.getElementById('command-palette').close(); }
 });
 document.getElementById('command-palette')?.addEventListener('click', e => {

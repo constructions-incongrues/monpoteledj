@@ -18,13 +18,13 @@ export function enableFlemme() {
   flemmeMode = true;
   document.body.classList.add('flemme-mode');
 
-  // Build playlist: marked tracks if filter active, else all tracks with marks > 0, else all
+  // Build playlist: marked tracks if filter active, else all tracks with mark > 0, else all
   flemmePlaylist = LIBRARY
     .map((t, i) => ({ track: t, idx: i }))
     .filter(({ track }) => {
-      if (markFilter > 0) return track.marks === markFilter;
-      if (markFilter === -1) return track.marks > 0;
-      return track.marks > 0; // default: all marked
+      if (markFilter > 0) return track.mark === markFilter;
+      if (markFilter === -1) return track.mark > 0;
+      return track.mark > 0; // default: all marked
     })
     .map(({ idx }) => idx);
 
