@@ -446,6 +446,13 @@ window.addEventListener('keydown', e => {
 });
 
 // Shortcuts help dialog handlers
+document.getElementById('shortcuts-help-open')?.addEventListener('click', () => {
+  const dialog = document.getElementById('shortcuts-help');
+  if (!dialog?.open) dialog?.showModal();
+});
+document.getElementById('mode-toggle-btn')?.addEventListener('click', () => {
+  toggleFlemme();
+});
 document.getElementById('shortcuts-close')?.addEventListener('click', () =>
   document.getElementById('shortcuts-help').close());
 document.getElementById('shortcuts-help')?.addEventListener('click', e => {

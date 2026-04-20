@@ -198,7 +198,7 @@ export function loadTrack(deckId, trackIdx) {
   document.getElementById(`title-${deckId}`).textContent = track.title;
   document.getElementById(`contrib-${deckId}`).textContent = track.contrib;
   const bodyEl = document.getElementById(`track-body-${deckId}`);
-  if (bodyEl) bodyEl.innerHTML = track.body || '';
+  if (bodyEl) bodyEl.textContent = track.body || '';
   const linkEl = document.getElementById(`post-link-${deckId}`);
   if (linkEl) { linkEl.href = track.postUrl || '#'; linkEl.hidden = !track.postUrl; }
   document.getElementById(`bpm-${deckId}`).textContent = track.bpm ?? '—';

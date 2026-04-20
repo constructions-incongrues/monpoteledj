@@ -170,16 +170,39 @@ export function renderFlemmePlaylist(trackIndices, currentIdx = 0) {
   container.innerHTML = '';
   const section = document.createElement('div');
   section.className = 'playlist flemme-playlist';
-  section.innerHTML = `
-    <table class="playlist-table"><tbody>${trackIndices.map((i, pos) => {
-      const t = LIBRARY[i];
-      if (!t) return '';
-      return `<tr data-idx="${i}" data-pos="${pos}"${pos === currentIdx ? ' class="flemme-current"' : ''}>
-        <td class="artist">${t.artist || '—'}</td>
-        <td class="title">${t.title || '—'}</td>
-        <td class="contrib" data-contrib="${t.contrib || ''}">${t.contrib || '—'}</td>
-      </tr>`;
-    }).join('')}</tbody></table>`;
+
+  const table = document.createElement('table');
+  table.className = 'playlist-table';
+  const tbody = document.createElement('tbody');
+
+  trackIndices.forEach((i, pos) => {
+    const t = LIBRARY[i];
+    if (!t) return;
+
+    const row = document.createElement('tr');
+    row.dataset.idx = String(i);
+    row.dataset.pos = String(pos);
+    if (pos === currentIdx) row.classList.add('flemme-current');
+
+    const artistCell = document.createElement('td');
+    artistCell.className = 'artist';
+    artistCell.textContent = t.artist || '—';
+
+    const titleCell = document.createElement('td');
+    titleCell.className = 'title';
+    titleCell.textContent = t.title || '—';
+
+    const contribCell = document.createElement('td');
+    contribCell.className = 'contrib';
+    contribCell.dataset.contrib = t.contrib || '';
+    contribCell.textContent = t.contrib || '—';
+
+    row.append(artistCell, titleCell, contribCell);
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  section.appendChild(table);
   container.appendChild(section);
 }
 

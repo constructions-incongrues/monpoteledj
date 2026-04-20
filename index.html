@@ -1337,17 +1337,10 @@ body {
     <button class="mact-btn" id="command-palette-open" type="button" title="Palette de commandes (⌘K)">
       Commandes <kbd>⌘K</kbd>
     </button>
-    <button class="mact-btn" type="button" title="Raccourcis clavier (?)"
-      onclick="document.getElementById('shortcuts-help').showModal()">
+    <button class="mact-btn" id="shortcuts-help-open" type="button" title="Raccourcis clavier (?)">
       Raccourcis <kbd>?</kbd>
     </button>
-    <script>
-      function toggleMode() {
-        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f', bubbles: true }));
-      }
-    </script>
-    <button class="mact-btn mact-toggle" id="mode-toggle-btn" type="button"
-      onclick="toggleMode()">
+    <button class="mact-btn mact-toggle" id="mode-toggle-btn" type="button">
       <span class="mode-label-normal">La F… <kbd>F</kbd></span>
       <span class="mode-label-flemme">Tournetablisme <kbd>F</kbd></span>
     </button>
@@ -1396,7 +1389,7 @@ body {
         <div class="artist" id="title-a">Aucun morceau chargé</div>
         <div class="contrib">Contribué par&nbsp;: <em id="contrib-a">—</em></div>
         <div class="track-body" id="track-body-a"></div>
-        <a class="post-link" id="post-link-a" href="#" target="_blank" hidden>Voir sur le site →</a>
+        <a class="post-link" id="post-link-a" href="#" target="_blank" rel="noopener noreferrer" hidden>Voir sur le site →</a>
       </div>
     </div><!-- /.track-info -->
 
@@ -1531,7 +1524,7 @@ body {
         <div class="artist" id="title-b">Aucun morceau chargé</div>
         <div class="contrib">Contribué par&nbsp;: <em id="contrib-b">—</em></div>
         <div class="track-body" id="track-body-b"></div>
-        <a class="post-link" id="post-link-b" href="#" target="_blank" hidden>Voir sur le site →</a>
+        <a class="post-link" id="post-link-b" href="#" target="_blank" rel="noopener noreferrer" hidden>Voir sur le site →</a>
       </div>
     </div><!-- /.track-info -->
 

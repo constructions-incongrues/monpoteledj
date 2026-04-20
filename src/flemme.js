@@ -40,7 +40,7 @@ export function enableFlemme() {
   // Build playlist: tracks marked 1, fallback to 50 random
   flemmePlaylist = LIBRARY
     .map((t, i) => ({ t, i }))
-    .filter(({ t }) => t.marks === 1)
+    .filter(({ t }) => t.mark === 1)
     .map(({ i }) => i);
 
   if (flemmePlaylist.length === 0) {
